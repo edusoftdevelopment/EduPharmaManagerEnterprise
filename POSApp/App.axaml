@@ -1,0 +1,22 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="POSApp.App"
+             xmlns:local="using:POSApp"
+             RequestedThemeVariant="Light">
+
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+  
+    <Application.Styles>
+        <FluentTheme DensityStyle="Compact" />
+        <StyleInclude Source="Styles/AppDefaultStyles.axaml"></StyleInclude>
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+    </Application.Styles>
+             
+    <Application.Resources>
+        <!-- <SolidColorBrush x:Key="PrimaryBackground">#14172d</SolidColorBrush> -->
+        
+    </Application.Resources>
+    
+</Application>

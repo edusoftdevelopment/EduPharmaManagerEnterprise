@@ -1,0 +1,64 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <!-- Add Controls for Previewer Here -->
+            <Button Classes="login">Login</Button>
+        </Border>
+    </Design.PreviewWith>
+
+    <!-- Add Styles Here -->
+    <Style Selector="Button">
+        <Setter Property="Foreground" Value="Black" ></Setter>
+        <Style Selector="^:pointerover /template/ ContentPresenter">
+        </Style>
+        <Style Selector="^.active">
+            <Setter Property="Background" Value="LightCoral" ></Setter>
+            <Setter Property="Foreground" Value="White" ></Setter>
+        </Style>
+        
+        <Style Selector="^.accent">
+            <Setter Property="Background" Value="LightBlue" ></Setter>
+            <Setter Property="Foreground" Value="White" ></Setter>
+        </Style>
+        
+        <Style Selector="^.login">
+            <Setter Property="Background" Value="LightBlue"></Setter>
+            <Setter Property="Foreground" Value="White"></Setter>
+            <Setter Property="CornerRadius" Value="10"></Setter>
+            <Setter Property="FontWeight" Value="500"></Setter>
+            <Setter Property="Padding" Value="10"></Setter>
+        </Style>
+        
+        <Style Selector="^.login:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="LightBlue"></Setter>
+            <Setter Property="Foreground" Value="White"></Setter>
+            <Setter Property="Opacity" Value="0.9" />
+        </Style>
+        
+        <Style Selector="^.accent:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="LightBlue"></Setter>
+            <Setter Property="Foreground" Value="White"></Setter>
+            <Setter Property="Opacity" Value="0.9" />
+        </Style>
+        
+        <Style Selector="^.active:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="LightCoral"></Setter>
+            <Setter Property="Foreground" Value="White"></Setter>
+            <Setter Property="Opacity" Value="0.9" />
+        </Style>
+    </Style>
+    <Style Selector="TextBlock.h1">
+        <Setter Property="FontSize" Value="26"></Setter>
+        <Setter Property="FontWeight" Value="Bold"></Setter>
+    </Style>
+    
+    
+    <!-- -->
+    <!-- <Style Selector="Button.active"> -->
+    <!--     <Setter Property="Foreground" Value="{DynamicResource ActiveForeground}"></Setter> -->
+    <!--     <Setter Property="Background" Value="{DynamicResource ActiveBackground}"></Setter> -->
+    <!-- </Style> -->
+    
+    
+</Styles>

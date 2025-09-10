@@ -1,0 +1,225 @@
+Login
+Application name : eduPharmaManagerEnterprise
+
+
+Select * from gen_SingleConnections Where ApplicationCodeName='" & applicationName & "'
+
+
+
+
+
+
+OK
+----
+
+1. Connection Establish
+Select * From LoginInfo
+
+
+
+
+
+Main Form Active
+
+
+    Dim ShowAtStartup As Long, LoginEmployeeName As String, SQL As String
+    Set cN = myRightObject.DBConnection
+    backDateEditingAllowed = myRightObject.backDateWorkingAllowed
+    
+    
+    IsTerminalTaxActive = TerminalTaxActive(TerminalName)
+    TAXSYSTEMShortcut = get_TAXSYSTEMShortcut
+        
+    If TAXSYSTEMShortcut <> "" Then
+        TAXSYSTEMKey = Asc(UCase(Mid(TAXSYSTEMShortcut, InStr(InStr(1, TAXSYSTEMShortcut, "+") + 1, TAXSYSTEMShortcut, "+") + 1, Len(TAXSYSTEMShortcut))))
+        TAXSYSTEMMASK1 = get_Key(Mid(TAXSYSTEMShortcut, 1, InStr(1, TAXSYSTEMShortcut, "+") - 1))
+        TAXSYSTEMMASK2 = get_Key(Mid(TAXSYSTEMShortcut, InStr(1, TAXSYSTEMShortcut, "+") + 1, InStr(InStr(1, TAXSYSTEMShortcut, "+") + 1, TAXSYSTEMShortcut, "+") - InStr(1, TAXSYSTEMShortcut, "+") - 1))
+    End If
+    
+    With cN.Execute("Select * from gen_appconfig")
+        If .RecordCount > 0 Then
+             CashierClosingWithoutEmployee = IIf(IsNull(.Fields("CashierClosingWithoutEmployee")), False, .Fields("CashierClosingWithoutEmployee"))
+             DeliveryChargesMaxBillAmount = Val(.Fields("DeliveryChargesMaxBillAmount") & "")
+             PrintDiscount = Val(.Fields("PrintDiscount") & "")
+             
+             SessionBaseBillNo = IIf(IsNull(.Fields("SessionBaseBillNo")), False, .Fields("SessionBaseBillNo"))
+             
+             DontUseVisitInfoFormOnSales = IIf(IsNull(.Fields("DontUseVisitInfoFormOnSales")), False, .Fields("DontUseVisitInfoFormOnSales"))
+             ImportedItemRatesfromProduct = IIf(IsNull(.Fields("ImportedItemRatesfromProduct")), False, .Fields("ImportedItemRatesfromProduct"))
+             bln_RistrictBelowThanMRPINSALE = IIf(IsNull(.Fields("RistrictBelowThanMRPINSALE")), False, .Fields("RistrictBelowThanMRPINSALE"))
+             
+             bln_RistrictMultiSalesReturnAgainstSales = IIf(IsNull(.Fields("RistrictMultiSalesReturnAgainstSales")), False, .Fields("RistrictMultiSalesReturnAgainstSales"))
+             bln_RistrictBackDateSalesReturnIntoSales = IIf(IsNull(.Fields("RistrictBackDateSalesReturnIntoSales")), False, .Fields("RistrictBackDateSalesReturnIntoSales"))
+             
+             FocusOnMRNo = IIf(IsNull(.Fields("FocusOnMRNo")), False, .Fields("FocusOnMRNo"))
+             PackmanOnSales = IIf(IsNull(.Fields("PackmanOnSales")), False, .Fields("PackmanOnSales"))
+             DontAddSameProductRowInSales = IIf(IsNull(.Fields("DontAddSameProductRowInSales")), False, .Fields("DontAddSameProductRowInSales"))
+             IsEstimationToPacking = IIf(IsNull(.Fields("EstimationToPacking")), False, .Fields("EstimationToPacking"))
+             RestrictBatchSelectionOnEstimateAndSales = IIf(IsNull(.Fields("RestrictBatchSelectionOnEstimateAndSales")), False, .Fields("RestrictBatchSelectionOnEstimateAndSales"))
+             ShowSearchWindowStyle2 = IIf(IsNull(.Fields("ShowSearchWindowStyle2")), False, .Fields("ShowSearchWindowStyle2"))
+             bln_DontCheckProductPrice = IIf(IsNull(.Fields("DontCheckProductPrice")), False, .Fields("DontCheckProductPrice"))
+             bln_AlternateCodeInNumber = IIf(IsNull(.Fields("AlternateCodeInNumber")), False, .Fields("AlternateCodeInNumber"))
+             bln_EstimateLPSalesLOG = IIf(IsNull(.Fields("EstimateLPSalesLOG")), False, .Fields("EstimateLPSalesLOG"))
+             bln_NetAmountChangeableOnSale = IIf(IsNull(.Fields("NetAmountChangeableOnSale")), False, .Fields("NetAmountChangeableOnSale"))
+             NewerExpiryRestrictionType = IIf(IsNull(.Fields("RestrictAllowExpirySales")), False, .Fields("RestrictAllowExpirySales"))
+             RistrictbatchWiseItemEntryThroughKeyboard = IIf(IsNull(.Fields("RistrictbatchWiseItemEntryThroughKeyboard")), False, .Fields("RistrictbatchWiseItemEntryThroughKeyboard"))
+             GCustomerId = IIf(IsNull(.Fields("DefaultCustomerParty")), 0, .Fields("DefaultCustomerParty"))
+             GOnlineCustomerId = IIf(IsNull(.Fields("DefaultOnlineCustomerParty")), 0, .Fields("DefaultOnlineCustomerParty"))
+             defaultsalesstyle = IIf(IsNull(.Fields("DefaultSalesStyle")), 0, .Fields("DefaultSalesStyle"))
+             FolderPath = IIf(IsNull(.Fields("FolderPath")), "", .Fields("FolderPath"))
+             defaultsalesReturnstyle = IIf(IsNull(.Fields("DefaultSalesReturnStyle")), 0, .Fields("DefaultSalesReturnStyle"))
+             bln_DataMatrixOnDrap = IIf(IsNull(.Fields("DataMatrixOnDrap")), False, .Fields("DataMatrixOnDrap"))
+             bln_PurchaseSaveOnDetailEntry = IIf(IsNull(.Fields("PurchaseSaveOnDetailEntry")), False, .Fields("PurchaseSaveOnDetailEntry"))
+             bln_LastSalesDiscountPartyAndProductWise = IIf(IsNull(.Fields("LastSalesDiscountPartyAndProductWise")), False, .Fields("LastSalesDiscountPartyAndProductWise"))
+             lng_BranchPartyID = IIf(IsNull(.Fields("BranchPartyID")), 0, .Fields("BranchPartyID"))
+             
+             bln_In24Hours = IIf(IsNull(.Fields("In24Hours")), False, .Fields("In24Hours"))
+             bln_FinalizeWorkingOnPurchase = IIf(IsNull(.Fields("FinalizeWorkingOnPurchase")), False, .Fields("FinalizeWorkingOnPurchase"))
+             bln_DonotResetVouchersOnNew = IIf(IsNull(.Fields("DonotResetVouchersOnNew")), False, .Fields("DonotResetVouchersOnNew"))
+             bln_AllowMRPModificationInSales = IIf(IsNull(.Fields("AllowMRPModificationInSales")), False, .Fields("AllowMRPModificationInSales"))
+             bln_AutoClearSales = IIf(IsNull(.Fields("AutoClearSalesInvoice")), False, .Fields("AutoClearSalesInvoice"))
+             AutoClearSalesSeconds = Val(.Fields("AutoClearSalesInvoiceTime") & "")
+             
+             bln_DisablePatientExtraInfo = IIf(IsNull(.Fields("DisablePatientExtraInfo")), False, .Fields("DisablePatientExtraInfo"))
+             bln_UseDataMatrixOnSystem = IIf(IsNull(.Fields("UseDataMatrixOnSystem")), False, .Fields("UseDataMatrixOnSystem"))
+             bln_RestrictProductDiscUptoIMaxDisc = IIf(IsNull(.Fields("RestrictProductDiscUptoIMaxDisc")), False, .Fields("RestrictProductDiscUptoIMaxDisc"))
+             PrintInPacks = IIf(IsNull(.Fields("InPacks")), False, .Fields("InPacks"))
+             FastBillPrint = IIf(IsNull(.Fields("FastBillPrint")), False, .Fields("FastBillPrint"))
+             AutoPrintVoucher = IIf(IsNull(.Fields("AutoPrintVoucher")), False, .Fields("AutoPrintVoucher"))
+             HideDetailMaxDiscountOnSale = IIf(IsNull(.Fields("HideDetailMaxDiscountOnSale")), False, .Fields("HideDetailMaxDiscountOnSale"))
+             bln_LoadNetAmountInDenomination = IIf(IsNull(.Fields("LoadNetAmountInDenomination")), False, .Fields("LoadNetAmountInDenomination"))
+             bln_Manufacturediscount = IIf(IsNull(.Fields("ShowManufacturerDiscountOnSale")), False, .Fields("ShowManufacturerDiscountOnSale"))
+             bln_RistrictAutoCoursorOnQtyInSales = IIf(IsNull(.Fields("RistrictAutoCoursorOnQtyInSales")), False, .Fields("RistrictAutoCoursorOnQtyInSales"))
+             Bln_OneQty = IIf(IsNull(.Fields("ShowOneQtyAtSale")), False, .Fields("ShowOneQtyAtSale"))
+             StockHolderEnable = IIf(IsNull(.Fields("UseDefaultProductStockHolder")), False, .Fields("UseDefaultProductStockHolder"))
+             App_bln_QuantityInVouchers = IIf(IsNull(.Fields("QtyInVouchers")), False, .Fields("QtyInVouchers"))
+             App_bln_ProductInVouchers = IIf(IsNull(.Fields("ProductInVouchers")), False, .Fields("ProductInVouchers"))
+        End If
+    End With
+
+	CurrentSessionID = get_CurrentSessionId
+	Call CurrentDateId
+
+
+SQL = "SELECT StockHolderID, HolderTitle FROM gen_StockHoldersInfo "
+    Set rsEst_StockHolder = cN.Execute(SQL)
+
+
+    SQL = "SELECT     PartyId, PartyName From gen_PartiesInfo where 0 = 0 "
+    SQL = SQL & " and Discontinue=0"
+    Set rsEst_Parties = cN.Execute(SQL)
+
+
+
+
+    SQL = "select EmployeeCode, EmployeeName from gen_EmployeesInfo Where SalariedEmployee=1 and Collecter = 1 "
+    SQL = SQL & " and discontinue = 0 "
+    If myRightObject.get_UserBusinessUnitId > 0 Then
+        SQL = SQL & " and businessUnitID = " & myRightObject.get_UserBusinessUnitId
+    End If
+    SQL = SQL & " Order By EmployeeName"
+    Set rsEst_Employees = cN.Execute(SQL)
+
+
+    SQL = "select EmployeeCode, EmployeeName from gen_EmployeesInfo Where salesman = 1  "
+    SQL = SQL & " and discontinue = 0 "
+    If myRightObject.get_UserBusinessUnitId > 0 Then
+        SQL = SQL & " and businessUnitID = " & myRightObject.get_UserBusinessUnitId
+    End If
+    SQL = SQL & " Order By EmployeeName"
+    Set rsEst_SalesmanEmployees = cN.Execute(SQL)
+
+
+    SQL = "select EmployeeCode, EmployeeName from gen_EmployeesInfo Where Packman = 1  "
+    SQL = SQL & " and discontinue = 0 "
+    If myRightObject.get_UserBusinessUnitId > 0 Then
+        SQL = SQL & " and businessUnitID = " & myRightObject.get_UserBusinessUnitId
+    End If
+    SQL = SQL & " Order By EmployeeName"
+    Set rsEst_PackmanEmployee = cN.Execute(SQL)
+
+
+
+    SQL = "Select  DoctorName ,DoctorId  from gen_DoctorsInfo "
+    Set rsEst_Doctor = cN.Execute(SQL)
+    
+    SQL = "SELECT     PartyId, PartyName From gen_PartiesInfo where 0 = 0 "
+    SQL = SQL & " and Discontinue=0"
+    Set rsEst_Parties = cN.Execute(SQL)
+
+
+    SQL = "SELECT BusinessUnitID, BusinessUnitTitle FROM gen_BusinessUnitInfo"
+    If Est_usr_DefaultBusinessUnitID > 0 Then
+        SQL = SQL & " WHERE BusinessUnitID = " & Est_usr_DefaultBusinessUnitID
+    End If
+
+    Set rsEst_BusinessUnit = cN.Execute(SQL)
+
+
+    With cN.Execute("Select Top 1 businessUnitID from gen_BusinessUnitInfo")
+        If .RecordCount > 0 Then
+            If Not IsNull(.Fields("businessUnitID")) Then
+                BusinessUnitID = .Fields("businessUnitID")
+            Else
+                BusinessUnitID = 0
+            End If
+        Else
+            BusinessUnitID = 0
+        End If
+    End With
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+Function get_CurrentSessionId() As Long
+    With cN.Execute(" Select SessionID  from SessionInfo Where currentSession = 1 ")
+        If .RecordCount > 0 Then
+            If Not IsNull(.Fields("SessionID")) Then
+                get_CurrentSessionId = .Fields("SessionID")
+            Else
+                get_CurrentSessionId = 0
+            End If
+        Else
+            get_CurrentSessionId = 0
+        End If
+    End With
+End Function
+
+Public Sub CurrentDateId()
+On Error GoTo DelErr
+Set rsTemp = New ADODB.Recordset
+rsTemp.Open "SELECT * FROM [DailyBalances] where [Currentdate]=1", cN, adOpenDynamic, adLockOptimistic
+With rsTemp
+    If Not .EOF Then
+        dCurrentDate = .Fields("DailyDate")
+        vDailyBalanceId = .Fields("DailyBalancesId")
+    End If
+End With
+Set rsTemp = Nothing
+
+Exit Sub
+DelErr:
+Call DelError
+
+End Sub

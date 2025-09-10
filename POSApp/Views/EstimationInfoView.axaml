@@ -1,0 +1,335 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             xmlns:vm="using:POSApp.ViewModels"
+             d:DesignWidth="1100" d:DesignHeight="600"
+             MinWidth="1180" MinHeight="650"
+             Padding="10"
+             FontWeight="DemiBold"
+             x:DataType="vm:EstimationInfoViewModel"
+             x:Class="POSApp.Views.EstimationInfoView"
+             Focusable="True"
+             >
+    <ScrollViewer>
+        <StackPanel Spacing="10">
+            <StackPanel Orientation="Horizontal" Spacing="20" HorizontalAlignment="Right">
+                <Button Command="{Binding HideGridColumnsCommand}">Hide Grid Columns</Button>
+                <CheckBox IsChecked="{Binding IsPrescriptionReceived, Mode=TwoWay}">Prescription Rewards</CheckBox>
+            </StackPanel>
+
+            <TabControl>
+                <TabItem Header="Estimation Info">
+                    <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto">
+                        <Border Padding="10" BorderBrush="LightGray" BorderThickness="2" CornerRadius="10">
+                            <Grid ColumnDefinitions="*, *, *" RowDefinitions="Auto,Auto,Auto" RowSpacing="10"
+                                  ColumnSpacing="10">
+                                <Grid Grid.Row="0" ColumnDefinitions="*,*">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label VerticalAlignment="Center" Width="70">Entry Date: </Label>
+                                        <CalendarDatePicker SelectedDateFormat="Custom"
+                                                            CustomDateFormatString="dd-MMM-yyyy"
+                                                            SelectedDate="{Binding SelectedEntryDate, Mode=TwoWay}">
+                                        </CalendarDatePicker>
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding IsUnDeletable, Mode=TwoWay}"
+                                              HorizontalAlignment="Right">
+                                        Un Deletable
+                                    </CheckBox>
+                                </Grid>
+                                <Grid Grid.Row="0" Grid.Column="1" ColumnDefinitions="Auto, Auto, Auto">
+                                    <Label VerticalAlignment="Center" Width="90" HorizontalAlignment="Right">Estimation No: </Label>
+                                    <TextBox
+                                        Text="{Binding EstimationNo, Mode=TwoWay}"
+                                        Grid.Column="1" Width="200" Background="Black" Foreground="Wheat"
+                                        FontWeight="Bold" TextAlignment="Center">
+                                    </TextBox>
+                                    <Button Grid.Column="2" Command="{Binding EstimationNoGoCommand}">Go</Button>
+                                </Grid>
+
+                                <Grid Grid.Row="0" Grid.Column="2" ColumnDefinitions="Auto, *">
+                                    <Label Grid.Column="0" Width="110" HorizontalContentAlignment="Right">Collected By: </Label>
+                                    <ComboBox
+                                        Grid.Column="1" HorizontalAlignment="Stretch"
+                                        ItemsSource="{Binding CollectedByList}"
+                                        DisplayMemberBinding="{Binding Label}"
+                                        IsTextSearchEnabled="True"
+                                        SelectedItem="{Binding SelectedCollectedBy, Mode=TwoWay}" />
+                                </Grid>
+
+
+                                <Grid Grid.Row="1" Grid.Column="0" ColumnDefinitions="Auto, *">
+                                    <Label VerticalAlignment="Center" Width="70" HorizontalContentAlignment="Right">Session: </Label>
+                                    <ComboBox
+                                        Grid.Column="1"
+                                        HorizontalAlignment="Stretch"
+                                        ItemsSource="{Binding SessionList}"
+                                        DisplayMemberBinding="{Binding Label}"
+                                        IsTextSearchEnabled="True"
+                                        SelectedItem="{Binding SelectedSession, Mode=TwoWay}">
+                                        <!-- <ComboBox.ItemTemplate> -->
+                                        <!--     <DataTemplate> -->
+                                        <!--         <TextBlock Text="{Binding Label}"></TextBlock> -->
+                                        <!--     </DataTemplate> -->
+                                        <!-- </ComboBox.ItemTemplate> -->
+                                    </ComboBox>
+                                </Grid>
+
+                                <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="Auto, *">
+                                    <Label Grid.Column="0" VerticalAlignment="Center" Width="90"
+                                           HorizontalAlignment="Right">
+                                        Business Unit:
+                                    </Label>
+                                    <ComboBox
+                                        Grid.Column="1" HorizontalAlignment="Stretch"
+                                        ItemsSource="{Binding BusinessUnitList}"
+                                        DisplayMemberBinding="{Binding Label}"
+                                        IsTextSearchEnabled="True"
+                                        SelectedItem="{Binding SelectedBusinessUnit, Mode=TwoWay}" />
+                                </Grid>
+
+                                <Grid Grid.Row="1" Grid.Column="2" ColumnDefinitions="Auto, *">
+                                    <Label VerticalAlignment="Center" Width="110" HorizontalContentAlignment="Right">Sales Return VNo.</Label>
+                                    <TextBox Grid.Column="1" Text="{Binding SalesReturnVNo, Mode=TwoWay}"></TextBox>
+                                </Grid>
+
+                                <Grid Grid.Row="2" Grid.Column="0" ColumnDefinitions="Auto, *">
+                                    <Label VerticalAlignment="Center" Width="70" HorizontalContentAlignment="Right">Party: </Label>
+                                    <ComboBox
+                                        Grid.Column="1" HorizontalAlignment="Stretch"
+                                        ItemsSource="{Binding PartyList}"
+                                        DisplayMemberBinding="{Binding Label}"
+                                        IsTextSearchEnabled="True"
+                                        SelectedItem="{Binding SelectedParty, Mode=TwoWay}" />
+                                </Grid>
+
+                                <Grid Grid.Row="2" Grid.Column="1" ColumnDefinitions="Auto, *">
+                                    <Label VerticalAlignment="Center" Width="90" HorizontalContentAlignment="Right">Customer: </Label>
+                                    <ComboBox
+                                        Grid.Column="1" HorizontalAlignment="Stretch"
+                                        ItemsSource="{Binding CustomerList}"
+                                        DisplayMemberBinding="{Binding Label}"
+                                        IsTextSearchEnabled="True"
+                                        SelectedItem="{Binding SelectedCustomer, Mode=TwoWay}" />
+                                </Grid>
+                                <Grid Grid.Row="2" Grid.Column="2" ColumnDefinitions="Auto, *">
+                                    <Label VerticalAlignment="Center" Width="110" HorizontalContentAlignment="Right">Sales Return Amt: </Label>
+                                    <TextBox Grid.Column="1" Text="{Binding SalesReturnAmount, Mode=TwoWay}"
+                                             Background="Blue" Foreground="White">
+                                    </TextBox>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                        <Border Grid.Row="1">
+                            <Grid RowDefinitions="Auto, Auto, *">
+                                <Grid ColumnSpacing="5"
+                                      ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                                    <StackPanel Grid.Column="0">
+                                        <Label>P.Code</Label>
+                                        <TextBox Text="{Binding ProductCode, Mode=TwoWay}">
+                                           
+                                        </TextBox>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1">
+                                        <Label>Product Name</Label>
+                                        <ComboBox
+                                            HorizontalAlignment="Stretch"
+                                            ItemsSource="{Binding ProductList}"
+                                            DisplayMemberBinding="{Binding Label}"
+                                            IsTextSearchEnabled="True"
+                                            SelectedItem="{Binding SelectedProduct, Mode=TwoWay}" >
+                                            <ComboBox.KeyBindings>
+                                                <KeyBinding Command="{Binding ProductSearchDialogCommand}" Gesture="F5"></KeyBinding>
+                                            </ComboBox.KeyBindings>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <Label>Batch No.</Label>
+                                        <TextBox Text="{Binding BatchNo, Mode=TwoWay}"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="3">
+                                        <Label>Expiry Date</Label>
+                                        <TextBox IsEnabled="False" Text="{Binding ExpiryDate, Mode=TwoWay}"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="4">
+                                        <Label>S.Size</Label>
+                                        <TextBox Text="{Binding Size, Mode=TwoWay}"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="5">
+                                        <Label>P.Code</Label>
+                                        <TextBox Text="{Binding PSize, Mode=TwoWay}"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="6">
+                                        <Label>Est.Days</Label>
+                                        <TextBox Text="{Binding EstimatedDays, Mode=TwoWay}" TextAlignment="Center"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="7">
+                                        <Label>Dose/Day</Label>
+                                        <TextBox Text="{Binding DoseOrDays, Mode=TwoWay}"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="8">
+                                        <Label>Est.Qty</Label>
+                                        <TextBox Text="{Binding EstimatedQty, Mode=TwoWay}"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="9">
+                                        <Label>Price</Label>
+                                        <TextBox Text="{Binding Price, Mode=TwoWay}"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="10">
+                                        <Label>Est.Gross</Label>
+                                        <TextBox Text="{Binding EstimatedGrossAmount, Mode=TwoWay}"></TextBox>
+                                    </StackPanel>
+                                </Grid>
+                                <Grid Grid.Row="1" ColumnSpacing="5"
+                                      ColumnDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, *">
+                                    <StackPanel Grid.Column="0">
+                                        <Label>B.Code.Stock</Label>
+                                        <TextBox Text="{Binding BarCodeStock, Mode=TwoWay}"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1">
+                                        <Label>Product.Stock</Label>
+                                        <TextBox Text="{Binding ProductStock, Mode=TwoWay}"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <Label>Stock Holder</Label>
+                                        <ComboBox
+                                            HorizontalAlignment="Stretch"
+                                            ItemsSource="{Binding StockHolderList}"
+                                            DisplayMemberBinding="{Binding Label}"
+                                            IsTextSearchEnabled="True"
+                                            SelectedItem="{Binding SelectedStockHolder, Mode=TwoWay}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="3">
+                                        <Label>BinLocation</Label>
+                                        <TextBox Text="{Binding BinLocation, Mode=TwoWay}"></TextBox>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="4" VerticalAlignment="Bottom">
+                                        <CheckBox IsChecked="{Binding WholeQtyLp, Mode=TwoWay}">Whole Qty LP.</CheckBox>
+                                    </StackPanel>
+                                    <Button Grid.Column="5" VerticalAlignment="Bottom" Command="{Binding MarketDemandCommand}">Market Demand</Button>
+                                    <StackPanel Grid.Column="6" Orientation="Horizontal" VerticalAlignment="Bottom"
+                                                HorizontalAlignment="Right">
+                                        <Button Background="LightGreen" Command="{Binding AddRowCommand}">Add</Button>
+                                        <Button Background="LightCoral" Command="{Binding ClearRowCommand}">Clear</Button>
+                                    </StackPanel>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                        <Border Grid.Row="2" Height="200">
+                            <DataGrid
+                                    GridLinesVisibility="All" 
+                                    Margin="0 10 0 10"
+                                    BorderBrush="Gray"
+                                    BorderThickness="1"
+                                    CanUserReorderColumns="True"
+                                    CanUserResizeColumns="True"
+                                    CanUserSortColumns="False"
+                                    ItemsSource="{Binding AddedProducts}"
+                                    >
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="P.Code" Binding="{Binding ProductCode}"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Product Name" Binding="{Binding ProductTitle}"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="BarCode"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Batch No"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Expiry"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Sl.Size"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="P.Size"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Est Days."></DataGridTextColumn>
+                                    <DataGridTextColumn Header="D.Per Day"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Est. Qty"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Rate"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Gross Amt."></DataGridTextColumn>
+                                    <DataGridTextColumn Header="Disc."></DataGridTextColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Border>
+                        <Border Grid.Row="3">
+                            <Grid ColumnDefinitions="Auto, Auto, *" ColumnSpacing="10">
+                                <StackPanel Grid.Column="0" Spacing="-10">
+                                    <CheckBox IsChecked="{Binding IsAutoPrintEstimation, Mode=TwoWay}">Auto Print Estimation</CheckBox>
+                                    <CheckBox IsChecked="{Binding IsAutoCustomerToken, Mode=TwoWay}">Auto Customer Token</CheckBox>
+                                    <CheckBox IsChecked="{Binding IsAutoPrintF7, Mode=TwoWay}">Auto Print F7</CheckBox>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1">
+                                    <StackPanel Orientation="Horizontal" Spacing="5">
+                                        <StackPanel>
+                                            <Label>Est.Days</Label>
+                                            <TextBox Text="{Binding EstimatedDays, Mode=TwoWay}"></TextBox>
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <Label>Items</Label>
+                                            <TextBox Text="{Binding Items, Mode=TwoWay}"></TextBox>
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <Label>Items Qty</Label>
+                                            <TextBox Text="{Binding ItemsQty, Mode=TwoWay}"></TextBox>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" HorizontalAlignment="Right">
+                                    <StackPanel Orientation="Horizontal" Spacing="5">
+                                        <StackPanel>
+                                            <Label>Est.Net Gross</Label>
+                                            <TextBox Text="{Binding EstimatedNetGrossAmount, Mode=TwoWay}" Background="Black" FontSize="24" Foreground="White"></TextBox>
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <Label>LP.Value</Label>
+                                            <TextBox Text="{Binding LPValue, Mode=TwoWay}" Background="Yellow" FontSize="24" BorderBrush="Transparent"
+                                                     Foreground="White">
+                                            </TextBox>
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <Label>Sales Return</Label>
+                                            <TextBox Text="{Binding SalesReturnAmount, Mode=TwoWay}" Background="Blue" FontSize="24" BorderBrush="Transparent"
+                                                     Foreground="White">
+                                            </TextBox>
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <Label>L.Max</Label>
+                                            <TextBox Text="{Binding LMax, Mode=TwoWay}"></TextBox>
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <Label>Disc %</Label>
+                                            <TextBox Text="{Binding DiscountPercentage, Mode=TwoWay}"></TextBox>
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <Label>Est. Disc</Label>
+                                            <TextBox Text="{Binding EstimatedDiscountAmount, Mode=TwoWay}"></TextBox>
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <Label>Est. Amount</Label>
+                                            <TextBox Text="{Binding EstimatedTotalAmount, Mode=TwoWay}" Background="LightCoral" FontSize="24" BorderBrush="Transparent"
+                                                     Foreground="White">
+                                            </TextBox>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        <Border Grid.Row="4">
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <Button Command="{Binding FirstCommand}">First</Button>
+                                <Button Command="{Binding PreviousCommand}">Previous</Button>
+                                <Button Command="{Binding NextCommand}">Next</Button>
+                                <Button Command="{Binding LastCommand}">Last</Button>
+                                <Button Command="{Binding SaveAsyncCommand}">Save</Button>
+                                <Button Command="{Binding EditCommand}">Edit</Button>
+                                <Button Command="{Binding DeleteCommand}">Delete</Button>
+                                <Button Command="{Binding SearchCommand}">Search</Button>
+                                <Button Command="{Binding PrintCommand}">Print</Button>
+                                <Button Command="{Binding CancelCommand}">Cancel</Button>
+                                <Button Command="{Binding MaximizeCommand}">Maximize</Button>
+                                <CheckBox IsChecked="{Binding IsPrintStyleTwo, Mode=TwoWay}" >Print Style 2</CheckBox>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Patient Information"></TabItem>
+                <TabItem Header="Sale Return Information"></TabItem>
+            </TabControl>
+
+        </StackPanel>
+    </ScrollViewer>
+
+</UserControl>

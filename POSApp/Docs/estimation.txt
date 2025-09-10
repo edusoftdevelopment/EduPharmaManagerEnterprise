@@ -1,0 +1,575 @@
+estimate Form
+
+Const master_TableName = "data_EstimationInfo"
+Const master_IDFld = "EstimationID"
+Const mfld_EstimationNo = "EstimationNo"
+Const mfld_EstimationDate = "EstimationDate"
+Const mfld_SessionID = "SessionID"
+Const mfld_BusinessUnitID = "BusinessUnitID"
+Const mfld_PartyID = "PartyID"
+Const mfld_CustomerName = "CustomerName"
+Const mfld_DoctorName = "DoctorName"
+Const mfld_DoctorId = "DoctorId"
+Const mfld_PatientName = "PatientName"
+Const mfld_PrescriptionDate = "PrescriptionDate"
+Const mfld_Gender = "Gender"
+Const mfld_Age = "Age"
+Const mfld_Symptoms = "Symptoms"
+Const mfld_Diagnose = "Diagnose"
+Const mfld_GrossAmount = "GrossAmount"
+Const mfld_NewRecordByEmployeeID = "NewRecordByEmployeeID"
+Const mfld_NewRecordDateTime = "NewRecordDateTime"
+Const mfld_ModifyRecordByEmployeeID = "ModifyRecordByEmployeeID"
+Const mfld_ModifyRecordDateTime = "ModifyRecordDateTime"
+Const mfld_MobileNo = "MobileNo"
+Const mfld_BuyerName = "BuyerName"
+Const mfld_CollectedById = "CollectedById"
+Const mfld_PrescriptionReceived = "PrescriptionReceived"
+
+
+
+
+
+GridColumns GridDetail, "PID", 0, flexAlignLeftCenter, _
+              "Sr No.", 300, flexAlignLeftCenter, _
+              "Code", 735, flexAlignCenterCenter, _
+              "Product Name", 3040, flexAlignLeftCenter, _
+              "HolderID", 0, flexAlignLeftCenter, _
+              "BarCode", 1000, flexAlignLeftCenter, _
+              "SupplierID", 0, flexAlignLeftCenter, "Supplier Title", 0, flexAlignLeftCenter, "SalesBase", 0, flexAlignCenterCenter, _
+              "Batch No.", 1215, flexAlignLeftCenter, _
+              "Expiry ", 1000, flexAlignLeftCenter, _
+              "St.Size", 660, flexAlignCenterCenter, _
+              "P.Size", 660, flexAlignCenterCenter, _
+              "Est. Days", 675, flexAlignCenterCenter, _
+              "D.per Day", 555, flexAlignCenterCenter, _
+              "Est. Qty", 570, flexAlignCenterCenter, _
+              "P.Cost", 0, flexAlignRightCenter, _
+              "Rate", 650, flexAlignRightCenter, _
+              "Gross Amt.", 0, flexAlignRightCenter, _
+              "Gross Amt.", 1005, flexAlignRightCenter, _
+              "Disc.", 650, flexAlignRightCenter, "Amount", 1005, flexAlignRightCenter, "MarketDemandID", 0, flexAlignLeftCenter, _
+              "StockRate", 0, flexAlignRightCenter, _
+              "StockRateSource", 0, flexAlignLeftCenter, _
+              "StockRateSourceID", 0, flexAlignLeftCenter, _
+              "Stock Holder", 1560, flexAlignLeftCenter, _
+              "MaxDiscount", 0, flexAlignLeftCenter, _
+              "fixedqty", 0, flexAlignLeftCenter, "marketretailprice", 0, flexAlignLeftCenter, "Please Focus On a Row", 0, flexAlignLeftCenter, "TempSens", 0, flexAlignLeftCenter, "Bin Location", 1200, flexAlignLeftCenter, "Exl From Sale", 1200, flexAlignLeftCenter
+              
+
+              GridDetail.RowHeight(0) = 450
+              GridDetail.RowHeightMin = 300
+              GridDetail.WordWrap = True
+              GridDetail.FixedCols = 2
+
+
+
+
+
+
+form Loading
+
+    PopulateProducts
+    DoEvents
+    Populate_Parties
+    DoEvents
+    PopulateEmployees
+    DoEvents
+    populateDoctors
+    DoEvents
+    PopulateSuppliers
+    DoEvents
+    PopulateSession
+    PopulateBusinessUnit
+    DoEvents
+    Populate_StockHolders
+
+
+        make_MasterSQL
+        GetMasterInfo master_MainSQL, master_SearchSQL, master_TableName, master_IDFld, rsMaster, master_CurrentRecordNo, master_MaxID, master_MinID, master_CurrentID, master_RecordCount, master_ActualRecordCount
+        CurrentMode = OperationMode(Me, opm_NavigationMode, master_RecordCount, master_ActualRecordCount)
+        ShowRecord
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Private Sub make_MasterSQL()
+
+master_MainSQL = " SELECT data_EstimationInfo.EstimationID, data_EstimationInfo.EstimationNo, data_EstimationInfo.EstimationDate "
+master_MainSQL = master_MainSQL & " , data_EstimationInfo.SessionID, data_EstimationInfo.BusinessUnitID, data_EstimationInfo.PartyID "
+master_MainSQL = master_MainSQL & " , data_EstimationInfo.CustomerName, data_EstimationInfo.DoctorId,data_EstimationInfo.DoctorName, data_EstimationInfo.PatientName, data_EstimationInfo.PrescriptionDate  "
+master_MainSQL = master_MainSQL & " , data_EstimationInfo.Gender, data_EstimationInfo.Age, data_EstimationInfo.EstimationDays "
+master_MainSQL = master_MainSQL & " , data_EstimationInfo.Symptoms, data_EstimationInfo.Diagnose, data_EstimationInfo.GrossAmount "
+master_MainSQL = master_MainSQL & " , data_EstimationInfo.NewRecordByEmployeeID, data_EstimationInfo.NewRecordDateTime "
+master_MainSQL = master_MainSQL & " , data_EstimationInfo.ModifyRecordByEmployeeID, data_EstimationInfo.ModifyRecordDateTime "
+master_MainSQL = master_MainSQL & " , Employees.EmployeeName AS EnterByEmployeeName, Employees_1.EmployeeName AS ModifiedByEmployeeName "
+master_MainSQL = master_MainSQL & " , data_EstimationInfo.UnDeleteable, data_EstimationInfo.SaleReturnID, pMaxDiscount, data_EstimationInfo.MobileNo, data_EstimationInfo.BuyerName,data_EstimationInfo.CollectedById , data_EstimationInfo.PrescriptionReceived"
+master_MainSQL = master_MainSQL & " FROM data_EstimationInfo "
+master_MainSQL = master_MainSQL & " LEFT OUTER JOIN "
+master_MainSQL = master_MainSQL & " Employees ON data_EstimationInfo.NewRecordByEmployeeID = Employees.EmployeeCode "
+master_MainSQL = master_MainSQL & " LEFT OUTER JOIN Employees Employees_1 "
+master_MainSQL = master_MainSQL & "         ON data_EstimationInfo.ModifyRecordByEmployeeID = Employees_1.EmployeeCode "
+master_MainSQL = master_MainSQL & " WHERE (data_EstimationInfo.EstimationID > 0) "
+master_MainSQL = master_MainSQL & " AND (data_EstimationInfo.Saved=1) "
+
+
+If Not IsNull(dbc_Session.SelectedItem) Then
+    master_MainSQL = master_MainSQL & " And (data_EstimationInfo.SessionID = " & dbc_Session.BoundText & ") "
+End If
+
+If Not IsNull(dbc_BusinessUnit.SelectedItem) Then
+    master_MainSQL = master_MainSQL & "  And (data_EstimationInfo.BusinessUnitID  = " & dbc_BusinessUnit.BoundText & ")"
+End If
+
+'If EstimateToMarketPurchase = True Then
+'     master_MainSQL = master_MainSQL & " and data_EstimationInfo.NewRecordByEmployeeID = " & myRightObject.get_UserEmployeeId
+'End If
+
+
+
+End Sub
+
+
+
+
+
+
+
+
+
+Private Sub PopulateSession()
+
+    With rsEst_Session
+        If .RecordCount > 0 Then
+            Set dbc_Session.RowSource = .Clone
+            dbc_Session.ListField = "SessionTitle"
+            dbc_Session.BoundColumn = "SessionID"
+            dbc_Session.BoundText = CurrentSessionID
+        Else
+            Set dbc_Session.RowSource = Nothing
+            dbc_Session.Text = ""
+        End If
+    End With
+End Sub
+
+Private Sub PopulateBusinessUnit()
+
+    With rsEst_BusinessUnit
+        If .RecordCount > 0 Then
+            Set dbc_BusinessUnit.RowSource = .Clone
+            dbc_BusinessUnit.ListField = "BusinessUnitTitle"
+            dbc_BusinessUnit.BoundColumn = "BusinessUnitID"
+            dbc_BusinessUnit.BoundText = BusinessUnitID
+        Else
+            Set dbc_BusinessUnit.RowSource = Nothing
+                dbc_BusinessUnit.Text = ""
+        End If
+    End With
+End Sub
+
+Private Sub Populate_Parties()
+    With rsEst_Parties
+        If .RecordCount > 0 Then
+            Set dbc_CustomerParty.RowSource = .Clone
+            dbc_CustomerParty.ListField = "PartyName"
+            dbc_CustomerParty.BoundColumn = "PartyId"
+        Else
+            Set dbc_CustomerParty.RowSource = Nothing
+            dbc_CustomerParty.Text = ""
+        End If
+    End With
+End Sub
+
+
+
+
+Private Sub PopulateSuppliers()
+    
+    Dim SQL As String
+    With rsEst_Parties
+        If .RecordCount > 0 Then
+            Set dbc_StockSupplier.RowSource = .Clone
+            dbc_StockSupplier.ListField = "PartyName"
+            dbc_StockSupplier.BoundColumn = "PartyId"
+        Else
+            Set dbc_StockSupplier.RowSource = Nothing
+            dbc_StockSupplier.Text = ""
+        End If
+    End With
+End Sub
+
+
+
+
+Private Sub populateDoctors()
+    With rsEst_Doctor
+        If .RecordCount > 0 Then
+            Set dbc_Doctor.RowSource = .Clone
+            dbc_Doctor.ListField = mfld_DoctorName
+            dbc_Doctor.BoundColumn = mfld_DoctorId
+        Else
+            Set dbc_Doctor.RowSource = Nothing
+        End If
+    End With
+End Sub
+
+
+
+
+Private Sub PopulateEmployees()
+    With rsEst_Employees
+        If .RecordCount > 0 Then
+            Set dbc_CollectedBy.RowSource = .Clone
+            dbc_CollectedBy.ListField = "EmployeeName"
+            dbc_CollectedBy.BoundColumn = "EmployeeCode"
+        End If
+    End With
+End Sub
+
+
+
+Private Sub PopulateProducts()
+    
+    Dim SQL As String
+    
+    SQL = " SELECT ProductID, ProductTitle "
+    SQL = SQL & " From vw_ProductsInfo"
+    SQL = SQL & " WHERE Discontinue = 0 AND SalesStop = 0 "
+    SQL = SQL & " AND PRODUCTID NOT IN( "
+    SQL = SQL & " SELECT PRODUCTId FROM gen_ProductsInfo "
+    SQL = SQL & " WHERE (gen_ProductsInfo.BrandID IN (SELECT ManufacturerID FROM data_StockTakingInfo WHERE Status = 'InProcess')) "
+    SQL = SQL & " ) "
+    SQL = SQL & " ORDER BY ProductTitle"
+
+    With cN.Execute(SQL)
+        If .RecordCount > 0 Then
+            Set dbc_ProductName.RowSource = .Clone
+            dbc_ProductName.ListField = "ProductTitle"
+            dbc_ProductName.BoundColumn = "ProductID"
+        Else
+            Set dbc_ProductName.RowSource = Nothing
+            dbc_ProductName.Text = ""
+        End If
+    End With
+End Sub
+
+
+
+Public Sub GetMasterInfo(pMaster_MainSQL, _
+                        pMaster_SearchSQL, _
+                        pMaster_TableName, _
+                        pMaster_IDFld, _
+                        prsMaster As Recordset, _
+                        ByRef pMaster_CurrentRecordNo, _
+                        ByRef pMaster_MaxID, _
+                        ByRef pMaster_MinID, _
+                        ByRef pMaster_CurrentID, _
+                        ByRef pMaster_RecordCount, _
+                        ByRef pMaster_ActualRecordCount, _
+                        Optional pDirection As MovePointer_Enum)
+                        
+Dim bln_InBuildWhere As Boolean
+Dim str_InBuildWhereClause As String
+
+Dim FilteredSQL As String
+Dim ShowSQL As String
+Dim pNavigationQuery As String
+
+bln_InBuildWhere = AnalizeWhereClause(pMaster_MainSQL, str_InBuildWhereClause)
+Select Case pDirection
+Case mp_First
+    pNavigationQuery = pMaster_IDFld & "=" & pMaster_MinID
+Case mp_Previous
+    If pMaster_CurrentID > pMaster_MinID Then
+        If pMaster_SearchSQL = "" Then
+            pNavigationQuery = pMaster_IDFld & "=(Select MAX(" & pMaster_IDFld & ") From " & pMaster_TableName & IIf(bln_InBuildWhere, str_InBuildWhereClause & " AND ", " Where ") & pMaster_IDFld & "<" & pMaster_CurrentID & ")"
+        Else
+            pNavigationQuery = pMaster_IDFld & "=(Select MAX(" & pMaster_IDFld & ") From " & pMaster_TableName & IIf(bln_InBuildWhere, str_InBuildWhereClause & " AND ", " Where ") & pMaster_IDFld & " IN (Select " & pMaster_IDFld & " From (" & pMaster_SearchSQL & ") EduTempTable01 ) AND " & pMaster_IDFld & "<" & pMaster_CurrentID & ")"
+        End If
+    Else
+        MsgBox "can't move Previous...", vbInformation
+        Exit Sub
+    End If
+Case mp_Next
+    If pMaster_CurrentID < pMaster_MaxID Then
+        If pMaster_SearchSQL = "" Then
+            pNavigationQuery = pMaster_IDFld & "=(Select MIN(" & pMaster_IDFld & ") From " & pMaster_TableName & IIf(bln_InBuildWhere, str_InBuildWhereClause & " AND ", " Where ") & pMaster_IDFld & ">" & pMaster_CurrentID & ")"
+        Else
+            pNavigationQuery = pMaster_IDFld & "=(Select MIN(" & pMaster_IDFld & ") From " & pMaster_TableName & IIf(bln_InBuildWhere, str_InBuildWhereClause & " AND ", " Where ") & pMaster_IDFld & " IN (Select " & pMaster_IDFld & " From (" & pMaster_SearchSQL & ") EduTempTable01 ) AND " & pMaster_IDFld & ">" & pMaster_CurrentID & ")"
+        End If
+    Else
+        MsgBox "can't move Next...", vbInformation
+        Exit Sub
+    End If
+Case mp_Last
+    pNavigationQuery = pMaster_IDFld & "=" & pMaster_MaxID
+Case 0
+    If pMaster_SearchSQL = "" Then pNavigationQuery = pMaster_IDFld & "=(Select Max(" & pMaster_IDFld & ") From " & pMaster_TableName & IIf(bln_InBuildWhere, str_InBuildWhereClause, "") & ")"
+Case Else
+    pNavigationQuery = pMaster_IDFld & "=" & pDirection
+End Select
+
+pMaster_CurrentRecordNo = 0
+pMaster_MaxID = 0
+pMaster_MinID = 0
+pMaster_CurrentID = 0
+pMaster_ActualRecordCount = cN.Execute("Select Count(*) as RecCount From " & pMaster_TableName & IIf(bln_InBuildWhere, str_InBuildWhereClause, "")).Fields("RecCount")
+If pMaster_SearchSQL <> "" Then
+    FilteredSQL = pMaster_MainSQL & " Where " & pMaster_IDFld & " IN (Select " & pMaster_IDFld & " From (" & pMaster_SearchSQL & ") EduTempTable)"
+    If pNavigationQuery <> "" Then ShowSQL = FilteredSQL & " AND " & pNavigationQuery Else ShowSQL = FilteredSQL
+Else
+    FilteredSQL = pMaster_MainSQL
+    If pNavigationQuery <> "" Then ShowSQL = FilteredSQL & IIf(bln_InBuildWhere, " AND ", " WHERE ") & pNavigationQuery Else ShowSQL = FilteredSQL
+End If
+pMaster_RecordCount = cN.Execute("Select Count(*) RecCount From (" & FilteredSQL & ") EduTempTable ").Fields("RecCount")
+
+Set prsMaster = cN.Execute(ShowSQL)
+If pMaster_RecordCount > 0 Then
+    pMaster_MaxID = cN.Execute("Select MAX(" & pMaster_IDFld & ") MxID From (" & FilteredSQL & ") EduTempTable ").Fields("MxID")
+    pMaster_MinID = cN.Execute("Select MIN(" & pMaster_IDFld & ") MnID From (" & FilteredSQL & ") EduTempTable ").Fields("MnID")
+    pMaster_CurrentID = IIf(prsMaster.EOF Or prsMaster.BOF, 0, prsMaster.Fields(pMaster_IDFld))
+    pMaster_CurrentRecordNo = cN.Execute("Select Count(*) RecCount From (" & FilteredSQL & ") EduTempTable Where " & pMaster_IDFld & "<=" & pMaster_CurrentID).Fields("RecCount")
+End If
+End Sub
+
+
+
+
+Private Sub ShowRecord()
+Dim EntryStatus As String, SaleReturnVNo As String, SaleReturnAmount As Double
+    ControlMode cma_Empty
+    stb_Message.Panels(1).Text = "Record:" & master_CurrentRecordNo & "/" & master_RecordCount
+    With rsMaster
+            If .RecordCount > 0 Then
+                master_CurrentID = .Fields(master_IDFld)
+                dtp_EntryDate.Value = IIf(IsNull(.Fields(mfld_EstimationDate)), "", Format(.Fields(mfld_EstimationDate), "dd-MMM-yyyy"))
+                txt_VoucherNo.Text = IIf(IsNull(.Fields(mfld_EstimationNo)), "", .Fields(mfld_EstimationNo))
+                dbc_CustomerParty.BoundText = IIf(IsNull(.Fields(mfld_PartyID)), "", .Fields(mfld_PartyID))
+                txt_CustomerName = IIf(IsNull(.Fields(mfld_CustomerName)), "", .Fields(mfld_CustomerName))
+                '''
+                dbc_Doctor.BoundText = IIf(IsNull(.Fields(mfld_DoctorId)), "", .Fields(mfld_DoctorId))
+                chk_PrescriptionReceived.Value = IIf(.Fields(mfld_PrescriptionReceived) = True, vbChecked, vbUnchecked)
+                '''
+                txt_PatientName.Text = IIf(IsNull(.Fields(mfld_PatientName)), "", .Fields(mfld_PatientName))
+                dtp_PrescriptionDate.Value = IIf(IsNull(.Fields(mfld_PrescriptionDate)), "", .Fields(mfld_PrescriptionDate))
+                cbo_Gender.ListIndex = IIf(IsNull(.Fields(mfld_Gender)), 0, IIf(.Fields(mfld_Gender) = False, 0, 1))
+                txt_Age.Text = IIf(IsNull(.Fields(mfld_Age)), "", .Fields(mfld_Age))
+                dtp_PrescriptionDate = IIf(IsNull(.Fields(mfld_PrescriptionDate)), Null, .Fields(mfld_PrescriptionDate))
+'                txt_Symptoms.Text = IIf(IsNull(.Fields(mfld_Symptoms)), "", .Fields(mfld_Symptoms))
+                
+                txt_MobileNo.Text = IIf(IsNull(.Fields(mfld_MobileNo)), "", .Fields(mfld_MobileNo))
+                txt_BuyerName.Text = IIf(IsNull(.Fields(mfld_BuyerName)), "", .Fields(mfld_BuyerName))
+                EstimationDays = Val(.Fields("EstimationDays") & "")
+                txt_TotalEstDays = EstimationDays
+                txt_GrossAmount.Text = IIf(IsNull(.Fields(mfld_GrossAmount)), "", .Fields(mfld_GrossAmount))
+                chk_UnDeleteAble.Value = IIf(.Fields("UnDeleteable") = True, vbChecked, vbUnchecked)
+                ShowDetail
+                CalculateTotalGrossAmount
+                
+                
+                
+             
+
+
+                
+                
+                
+                EntryStatus = "New Entry: " & .Fields("EnterByEmployeeName") & " On " & Format(.Fields(mfld_NewRecordDateTime), "dd-MMM-yyyy") & " " & FormatDateTime(.Fields(mfld_NewRecordDateTime), vbShortTime)
+                If Not IsNull(.Fields(mfld_ModifyRecordByEmployeeID)) Then
+                    EntryStatus = EntryStatus & ", Modify Entry: " & .Fields("ModifiedByEmployeeName") & " On " & Format(.Fields(mfld_ModifyRecordDateTime), "dd-MMM-yyyy") & " " & FormatDateTime(.Fields(mfld_ModifyRecordDateTime), vbShortTime)
+                End If
+                
+                If Val(.Fields("SaleReturnID") & "") > 0 Then
+                    ShowSaleReturnDetail SaleReturnVNo, Val(.Fields("SaleReturnID") & ""), SaleReturnAmount, True
+                    txt_SaleReturnVNo.Tag = Val(.Fields("SaleReturnID") & "")
+                    txt_SaleReturnVNo.Text = SaleReturnVNo
+                    txt_SaleReturnAmount.Text = SaleReturnAmount
+                    txt_SalesReturnTotal.Text = SaleReturnAmount
+                End If
+                
+                txt_MaxDiscPercent.Text = Val(.Fields("PMaxDiscount") & "")
+                txt_MaxDiscAmount = RoundZero(GetProductMaxDiscountTotal)
+                If Val(txt_GrossAmount) > 0 Then
+                    txt_DiscountPercent = Round(Val(txt_MaxDiscAmount) / Val(txt_GrossAmount) * 100, 2)
+                End If
+                
+                txt_NetAmount.Text = RoundZero(Val(txt_GrossAmount) + Val(txt_LPTotal) - Val(txt_MaxDiscAmount) - Val(txt_SalesReturnTotal))
+                dbc_CollectedBy.BoundText = IIf(IsNull(.Fields(mfld_CollectedById)), "", .Fields(mfld_CollectedById))
+                
+                'AutoFillPrescriptionRS IIf(EstimationDays > 0, EstimationDays, 1)
+                    
+                stb_Message.Panels(2).Text = EntryStatus
+            End If
+        End With
+    End Sub
+
+Private Sub ShowDetail()
+    Dim i As Long
+    Dim SQL As String
+    Dim GrossAmount As Double
+    Dim NetAmount As Double
+    Dim discountPercent As Double
+
+    
+    SQL = " SELECT     data_EstimationMultiDetail.EstimationMultiDetailID, data_EstimationMultiDetail.EstimationID, data_EstimationMultiDetail.ProductID, "
+    SQL = SQL & " data_EstimationMultiDetail.StockHolderID, data_EstimationMultiDetail.BatchNo, data_EstimationMultiDetail.ExpiryDate,"
+    SQL = SQL & " data_EstimationMultiDetail.PackSize, data_EstimationMultiDetail.StripSize , data_EstimationMultiDetail.PacksQty, data_EstimationMultiDetail.UnitQty,"
+    SQL = SQL & " data_EstimationMultiDetail.EstimationPacksQty, data_EstimationMultiDetail.EstimationUnitQty, data_EstimationMultiDetail.PackPrice,"
+    SQL = SQL & " vw_ProductsInfo.ProductCode, vw_ProductsInfo.ProductTitle, gen_StockHoldersInfo.HolderTitle, data_EstimationMultiDetail.EstimationDays,"
+    SQL = SQL & " data_EstimationMultiDetail.StockRate, data_EstimationMultiDetail.StockRateSource, data_EstimationMultiDetail.StockRateSourceID,"
+    SQL = SQL & " data_EstimationMultiDetail.SupplierId , data_EstimationMultiDetail.SalesBase, gen_PartiesInfo.PartyName"
+    SQL = SQL & " , ISNULL(data_EstimationMultiDetail.BarCodeStockID, 0) BarCodeStockID, vw_ProductsInfo.MaxDiscount , data_EstimationMultiDetail.FixedQty , data_EstimationMultiDetail.PackPriceStock  , vw_ProductsInfo.DuplicateProductName , vw_ProductsInfo.TemperatureSensitive ,  vw_ProductsInfo.BinLocation "
+    SQL = SQL & " , data_EstimationMultiDetail.ExcludeFromSales"
+    
+    
+    SQL = SQL & " FROM         data_EstimationMultiDetail LEFT OUTER JOIN"
+    SQL = SQL & " gen_PartiesInfo ON data_EstimationMultiDetail.SupplierID = gen_PartiesInfo.PartyId LEFT OUTER JOIN"
+    SQL = SQL & " gen_StockHoldersInfo ON data_EstimationMultiDetail.StockHolderID = gen_StockHoldersInfo.StockHolderID LEFT OUTER JOIN"
+    SQL = SQL & " vw_ProductsInfo ON data_EstimationMultiDetail.ProductID = vw_ProductsInfo.ProductID"
+    SQL = SQL & " Where (data_EstimationMultiDetail.EstimationID = " & master_CurrentID & ")"
+    SQL = SQL & "  order by vw_ProductsInfo.ProductTitle"
+    With cN.Execute(SQL)
+        If .RecordCount > 0 Then
+            .MoveFirst
+            For i = 1 To .RecordCount
+               GrossAmount = Round((.Fields("PackPrice") / .Fields("packSize")) * .Fields("EstimationUnitQty"), 5)
+                AddDataToGrid .Fields("ProductID") & "", .Fields("ProductCode") & "", .Fields("DuplicateProductName") & "", .Fields("MaxDiscount") & "", .Fields("StockHolderID") & "", .Fields("Holdertitle") & "", IIf(IsNull(.Fields("SupplierID")), "", .Fields("SupplierID")), IIf(IsNull(.Fields("PartyName")), "", .Fields("PartyName")), IIf(.Fields("SalesBase") = True, "YES", "NO"), .Fields("BatchNo"), Format(.Fields("ExpiryDate"), "MMM-yyyy"), .Fields("packSize"), .Fields("StripSize") & "", .Fields("EstimationDays"), .Fields("UnitQty") & "", .Fields("EstimationUnitQty") & "", .Fields("packPrice") & "", GrossAmount, .Fields("StockRate"), .Fields("StockRateSource"), .Fields("StockRateSourceID"), , , .Fields("FixedQty"), .Fields("PackPriceStock"), .Fields("ProductTitle") & "", .Fields("TemperatureSensitive"), .Fields("BinLocation") & "", .Fields("ExcludeFromSales")
+                
+                GridDetail.TextMatrix(GridDetail.Rows - 1, grid_BarCodeStockID) = .Fields("BarCodeStockID")
+                GridDetail.TextMatrix(i, grid_Srno) = i
+                If .Fields("TemperatureSensitive") = True Then
+                    GridDetail.Col = Grid_ProductName
+                    GridDetail.Row = i
+                    GridDetail.CellFontBold = True
+                    GridDetail.CellFontItalic = True
+                    GridDetail.CellFontSize = 10
+                End If
+                
+                .MoveNext
+            Next i
+        End If
+    End With
+    
+End Sub
+
+
+Public Sub AddDataToGrid(pID, pProductCode, pProductTitle, pMaxDiscount, pStockHolderID, pStockHolder, pSupplierID, pSupplierName, pSalesBase, pBatchNo, pExpiryDate, pSize, sSize, pEstDays, pQuantity, pEstQuantity, pPackCost, pGrossAmount, pStockRate, pStockRateSource, pStockRateSourceID, Optional pMarketDemandID As Long, Optional pBarCodeStockID As Long, Optional pFixed As Boolean, Optional MarketRetailPrice As Double, Optional dProductname As String, Optional TempSensitive As Boolean = False, Optional BinLocation As String, Optional ExlFromList As Boolean)
+Dim LastRow As Long
+With GridDetail
+    .Rows = .Rows + 1
+    .TextMatrix(.Rows - 1, Grid_ProductID) = pID & ""
+    .TextMatrix(.Rows - 1, Grid_ProductCode) = pProductCode & ""
+    .TextMatrix(.Rows - 1, Grid_ProductName) = pProductTitle & ""
+    .TextMatrix(.Rows - 1, grid_OrignalProductName) = dProductname & ""
+    .TextMatrix(.Rows - 1, grid_StockHolderID) = pStockHolderID & ""
+    .TextMatrix(.Rows - 1, grid_StockHolder) = pStockHolder & ""
+    .TextMatrix(.Rows - 1, grid_SupplierID) = pSupplierID & ""
+    .TextMatrix(.Rows - 1, grid_SupplierName) = pSupplierName & ""
+    .TextMatrix(.Rows - 1, grid_SalesBase) = pSalesBase & ""
+    .TextMatrix(.Rows - 1, grid_BatchNo) = pBatchNo & ""
+    .TextMatrix(.Rows - 1, grid_ExpiryDate) = pExpiryDate & ""
+    .TextMatrix(.Rows - 1, Grid_PackSize) = pSize & ""
+    .TextMatrix(.Rows - 1, Grid_StripSize) = sSize & ""
+    .TextMatrix(.Rows - 1, grid_Quantity) = pQuantity & ""
+    .TextMatrix(.Rows - 1, grid_EstimatedDays) = pEstDays & ""
+    .TextMatrix(.Rows - 1, grid_EstQuantity) = pEstQuantity & ""
+    .TextMatrix(.Rows - 1, grid_UnitCost) = pPackCost & ""
+    .TextMatrix(.Rows - 1, grid_UnitCostDisplay) = Round(pPackCost, 2) & ""
+    .TextMatrix(.Rows - 1, grid_GrossValue) = pGrossAmount & ""
+    .TextMatrix(.Rows - 1, grid_GrossValueDisplay) = Round(pGrossAmount, 2) & ""
+    .TextMatrix(.Rows - 1, grid_MarketDemandIDCol) = Val(pMarketDemandID & "")
+    .TextMatrix(.Rows - 1, grid_StockRate) = pStockRate & ""
+    .TextMatrix(.Rows - 1, grid_StockRateSource) = pStockRateSource & ""
+    .TextMatrix(.Rows - 1, grid_StockRateSourceID) = pStockRateSourceID & ""
+    .TextMatrix(.Rows - 1, grid_MaxDiscount) = pMaxDiscount
+    .TextMatrix(.Rows - 1, grid_MarketRetailPriceStock) = MarketRetailPrice
+    .TextMatrix(.Rows - 1, grid_FixedQty) = IIf(pFixed = True, 1, 0)
+    .TextMatrix(.Rows - 1, grid_TempSensitive) = TempSensitive
+    .TextMatrix(.Rows - 1, grid_BinLocation) = BinLocation
+    .TextMatrix(.Rows - 1, grid_ExcludeFromSales) = IIf(ExlFromList = True, "YES", "NO")
+    
+    If pBarCodeStockID > 0 Then
+        .TextMatrix(.Rows - 1, grid_BarCodeStockID) = pBarCodeStockID
+    End If
+End With
+End Sub
+
+
+
+Public Sub CalculateTotalGrossAmount()
+    Dim i As Long, totalGross As Double
+    txt_GrossAmount.Text = ""
+    txt_NoofItems.Text = ""
+    txt_NetQuantity.Text = ""
+    txt_LPTotal.Text = ""
+    With GridDetail
+        If .Rows - 1 > 0 Then
+            For i = 1 To .Rows - 1
+                totalGross = totalGross + Val(.TextMatrix(i, grid_GrossValue))
+                txt_NetQuantity = Val(txt_NetQuantity) + Val(.TextMatrix(i, grid_EstQuantity))
+                .TextMatrix(i, grid_Srno) = i
+            Next i
+        End If
+    End With
+    txt_LPTotal = RoundZero(LPTotal)
+    txt_GrossAmount = RoundZero(totalGross)
+    txt_NoofItems.Text = GridDetail.Rows - 1
+    txt_MaxDiscPercent_Change
+End Sub
+
+
+Private Function RoundZero(pNumber As Double) As Double
+Dim WholeNumStr As String, DecimalPos As Long, Num2Rtn As Double, WholeNum As Double, Remainder As Double
+
+WholeNumStr = Trim(CStr(pNumber))
+
+DecimalPos = InStr(1, WholeNumStr, ".")
+
+If DecimalPos > 0 Then
+    WholeNum = Val(Left(WholeNumStr, DecimalPos - 1))
+    Remainder = pNumber - WholeNum
+    If Remainder < 0.5 Then
+        Num2Rtn = WholeNum
+    ElseIf Remainder > 0.5 Then
+        Num2Rtn = WholeNum + 1
+    Else
+        If WholeNum Mod 2 <> 0 Then
+            Num2Rtn = WholeNum + 1
+        Else
+            Num2Rtn = WholeNum
+        End If
+    End If
+Else
+    Num2Rtn = pNumber
+End If
+    
+RoundZero = Num2Rtn
+End Function
+

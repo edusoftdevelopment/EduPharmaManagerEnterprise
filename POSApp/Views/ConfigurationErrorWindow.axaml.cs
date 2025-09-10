@@ -1,0 +1,13 @@
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
+
+namespace POSApp.Views;
+
+public partial class ConfigurationErrorWindow : Window
+{
+    public ConfigurationErrorWindow()
+    {
+        InitializeComponent();
+    }
+}
