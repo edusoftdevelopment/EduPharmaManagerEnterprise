@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Threading.Tasks;
@@ -27,6 +28,25 @@ public class DbHelper
         return dt;
     }
     
+    public async Task<List<T>> ExecuteQueryAsync<T>(
+        string sql,
+        Func<IDataReader, T> map,
+        params SqlParameter[] parameters)
+    {
+        using var conn = new SqlConnection(_connectionString);
+        using var cmd = new SqlCommand(sql, conn);
+        if (parameters?.Length > 0) cmd.Parameters.AddRange(parameters);
+
+        await conn.OpenAsync();
+        using var reader = await cmd.ExecuteReaderAsync();
+
+        var list = new List<T>();
+        while (await reader.ReadAsync())
+        {
+            list.Add(map(reader));
+        }
+        return list;
+    }
     
     public async Task<int> ExecuteNonQueryAsync(string sql, params SqlParameter[] parameters)
     {
@@ -69,5 +89,7 @@ public class DbHelper
         await conn.OpenAsync();
         return await cmd.ExecuteScalarAsync();
     }
+    
+    
 
 }

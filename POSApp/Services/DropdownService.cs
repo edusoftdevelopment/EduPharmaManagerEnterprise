@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
+using POSApp.Helpers;
 
 namespace POSApp.Services;
 
@@ -9,20 +11,22 @@ public class Dropdown<T>
     public required string Label { get; set; }
 }
 
-public class DropdownService
+public class DropdownService(DbHelper dbHelper, AppConfigService appConfigService)
 {
-    
-    public Task<IEnumerable<Dropdown<string>>> GetDefaultDatabases()
+    public async Task<IEnumerable<Dropdown<string>>> GetDefaultDatabases()
     {
-        return Task.FromResult<IEnumerable<Dropdown<string>>>(new List<Dropdown<string>>
+        const string query = "Select * from gen_SingleConnections Where ApplicationCodeName=@ApplicationCodeName";
+        return await dbHelper.ExecuteQueryAsync(query, row => new Dropdown<string>
         {
-            new() { Id = "Database", Label = "Database" },
-            new() { Id = "Database", Label = "Database" },
-            new() { Id = "Database", Label = "Database" }
+            Id = row.GetString(row.GetOrdinal("Id")),
+            Label = row.GetString(row.GetOrdinal("Label")),
+        }, new SqlParameter
+        {
+            ParameterName = "@ApplicationCodeName",
+            Value = appConfigService.ApplicationName
         });
     }
 
-    
     public Task<IEnumerable<Dropdown<int>>> GetCollectedByList()
     {
         return Task.FromResult<IEnumerable<Dropdown<int>>>(new List<Dropdown<int>>
@@ -33,7 +37,7 @@ public class DropdownService
         });
     }
 
-    
+
     public Task<IEnumerable<Dropdown<int>>> GetBusinessUnitList()
     {
         return Task.FromResult<IEnumerable<Dropdown<int>>>(new List<Dropdown<int>>
