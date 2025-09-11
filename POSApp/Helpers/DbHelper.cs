@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 
@@ -33,15 +34,17 @@ public class DbHelper
         Func<IDataReader, T> map,
         params SqlParameter[] parameters)
     {
-        using var conn = new SqlConnection(_connectionString);
-        using var cmd = new SqlCommand(sql, conn);
+        
+        await using var conn = new SqlConnection(_connectionString);
+        await using var cmd = new SqlCommand(sql, conn);
         if (parameters?.Length > 0) cmd.Parameters.AddRange(parameters);
 
-        await conn.OpenAsync();
-        using var reader = await cmd.ExecuteReaderAsync();
-
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        await conn.OpenAsync(cts.Token);
+        
+        await using var reader = await cmd.ExecuteReaderAsync(cts.Token);
         var list = new List<T>();
-        while (await reader.ReadAsync())
+        while (await reader.ReadAsync(cts.Token))
         {
             list.Add(map(reader));
         }

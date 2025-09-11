@@ -13,7 +13,7 @@ public class Dropdown<T>
 
 public class DropdownService(DbHelper dbHelper, AppConfigService appConfigService)
 {
-    public async Task<IEnumerable<Dropdown<string>>> GetDefaultDatabases()
+    public async Task<List<Dropdown<string>>> GetDefaultDatabases()
     {
         const string query = "Select * from gen_SingleConnections Where ApplicationCodeName=@ApplicationCodeName";
         return await dbHelper.ExecuteQueryAsync(query, row => new Dropdown<string>

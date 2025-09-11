@@ -31,7 +31,7 @@ public partial class LoginWindowViewModel(ILoginService loginService, DropdownSe
     
     public async Task InitializeAsync()
     {
-        DefaultDatabaseList = (await dropdownService.GetDefaultDatabases()).ToList();
+        DefaultDatabaseList = await dropdownService.GetDefaultDatabases();
         if (DefaultDatabaseList.Any())
         {
             SelectedDatabase = DefaultDatabaseList.First();

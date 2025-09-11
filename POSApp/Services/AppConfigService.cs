@@ -52,9 +52,8 @@ public class AppConfigService
         }
     }
 
-    public string BuildConnectionString(string server, string database, string username, string password)
+    private static string BuildConnectionString(string server, string database, string username, string password)
     {
-        return
-            $"Data Source={server};initial Catalog={database};Integrated Security=false;User Id={username};Password={password};Max Pool Size=32767;";
+        return $"Data Source={server};initial Catalog={database};Integrated Security=false;User Id={username};Password={password};Max Pool Size=32767;Connection Timeout=10;";
     }
 }

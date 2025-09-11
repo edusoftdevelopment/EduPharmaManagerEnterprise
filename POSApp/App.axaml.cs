@@ -1,7 +1,6 @@
-
 using System.Linq;
-
 using System;
+using System.Threading;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
@@ -26,30 +25,30 @@ public partial class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         var services = new ServiceCollection();
-        
+
         services.AddSingleton<MainWindowViewModel>();
         services.AddSingleton<AppStateViewModel>();
         services.AddSingleton<AppConfigService>();
-        
+
         services.AddScoped<DbHelper>();
         services.AddScoped<DropdownService>();
         services.AddScoped<ILoginService, LoginService>();
-        
+
         services.AddTransient<LoginWindowViewModel>();
         services.AddTransient<EstimationInfoViewModel>();
-        
+
         services.AddSingleton<Func<ApplicationPageNames, PageViewModel>>(x => name => name switch
         {
             ApplicationPageNames.EstimationInfo => x.GetRequiredService<EstimationInfoViewModel>(),
             _ => throw new ArgumentOutOfRangeException(nameof(name), name, null)
         });
         services.AddSingleton<PageFactory>();
-        
+
         var provider = services.BuildServiceProvider();
 
         var configService = provider.GetRequiredService<AppConfigService>();
         var hasConnection = configService.Load();
-        
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             DisableAvaloniaDataAnnotationValidation();
@@ -58,13 +57,13 @@ public partial class App : Application
             {
                 var dbHelper = provider.GetRequiredService<DbHelper>();
                 dbHelper.SetConnectionString(configService.ConnectionString);
-                
+
                 var appStateViewModel = provider.GetRequiredService<AppStateViewModel>();
                 if (appStateViewModel.User is null)
                 {
                     var loginViewModel = provider.GetRequiredService<LoginWindowViewModel>();
-                    loginViewModel.InitializeAsync().ConfigureAwait(false);
-                    
+                     loginViewModel.InitializeAsync().GetAwaiter().GetResult();
+
                     var loginWindow = new LoginWindowView()
                     {
                         DataContext = loginViewModel
@@ -77,12 +76,12 @@ public partial class App : Application
                             DataContext = provider.GetRequiredService<MainWindowViewModel>(),
                         };
                         mainWindow.Show();
-                        loginWindow.Close();
+                       // loginWindow.Close();
                         desktop.MainWindow = mainWindow;
                     };
-                    
+
                     desktop.MainWindow = loginWindow;
-                    loginWindow.Show();
+              //      loginWindow.Show();
                 }
                 else
                 {
@@ -90,14 +89,14 @@ public partial class App : Application
                     {
                         DataContext = provider.GetRequiredService<MainWindowViewModel>(),
                     };
-                }     
+                }
             }
             else
             {
                 desktop.MainWindow = new ConfigurationErrorWindow();
             }
         }
-        
+
         base.OnFrameworkInitializationCompleted();
     }
 
