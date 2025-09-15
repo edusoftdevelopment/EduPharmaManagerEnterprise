@@ -2,39 +2,48 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:shadui="clr-namespace:ShadUI;assembly=ShadUI"
              mc:Ignorable="d"
              xmlns:vm="using:POSApp.ViewModels"
              d:DesignWidth="1100" d:DesignHeight="600"
              MinWidth="1180" MinHeight="650"
              Padding="10"
-             FontWeight="DemiBold"
              x:DataType="vm:EstimationInfoViewModel"
              x:Class="POSApp.Views.EstimationInfoView"
-             Focusable="True"
-             >
+             Focusable="True">
     <ScrollViewer>
         <StackPanel Spacing="10">
             <StackPanel Orientation="Horizontal" Spacing="20" HorizontalAlignment="Right">
-                <Button Command="{Binding HideGridColumnsCommand}">Hide Grid Columns</Button>
-                <CheckBox IsChecked="{Binding IsPrescriptionReceived, Mode=TwoWay}">Prescription Rewards</CheckBox>
+                <Button Classes="Outline" Command="{Binding HideGridColumnsCommand}">Hide Grid Columns</Button>
+                <CheckBox IsEnabled="{Binding !IsViewMode}" IsChecked="{Binding IsPrescriptionReceived, Mode=TwoWay}">Prescription Rewards</CheckBox>
             </StackPanel>
 
             <TabControl>
                 <TabItem Header="Estimation Info">
-                    <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto">
+                    <TabItem.Styles>
+                        <Style Selector="TextBox.compact">
+                            <Setter Property="Padding" Value="8,4"></Setter>
+                            <Setter Property="FontSize" Value="12"></Setter>
+                        </Style>
+                    </TabItem.Styles>
+                    <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto" RowSpacing="5">
                         <Border Padding="10" BorderBrush="LightGray" BorderThickness="2" CornerRadius="10">
                             <Grid ColumnDefinitions="*, *, *" RowDefinitions="Auto,Auto,Auto" RowSpacing="10"
                                   ColumnSpacing="10">
                                 <Grid Grid.Row="0" ColumnDefinitions="*,*">
                                     <StackPanel Orientation="Horizontal">
                                         <Label VerticalAlignment="Center" Width="70">Entry Date: </Label>
-                                        <CalendarDatePicker SelectedDateFormat="Custom"
-                                                            CustomDateFormatString="dd-MMM-yyyy"
-                                                            SelectedDate="{Binding SelectedEntryDate, Mode=TwoWay}">
+                                        <CalendarDatePicker
+                                            IsEnabled="{Binding !IsViewMode}"
+                                            SelectedDateFormat="Custom"
+                                            CustomDateFormatString="dd-MMM-yyyy"
+                                            SelectedDate="{Binding SelectedEntryDate, Mode=TwoWay}">
                                         </CalendarDatePicker>
                                     </StackPanel>
-                                    <CheckBox Grid.Column="1" IsChecked="{Binding IsUnDeletable, Mode=TwoWay}"
-                                              HorizontalAlignment="Right">
+                                    <CheckBox
+                                        IsEnabled="{Binding !IsViewMode}"
+                                        Grid.Column="1" IsChecked="{Binding IsUnDeletable, Mode=TwoWay}"
+                                        HorizontalAlignment="Right">
                                         Un Deletable
                                     </CheckBox>
                                 </Grid>
@@ -42,10 +51,13 @@
                                     <Label VerticalAlignment="Center" Width="90" HorizontalAlignment="Right">Estimation No: </Label>
                                     <TextBox
                                         Text="{Binding EstimationNo, Mode=TwoWay}"
-                                        Grid.Column="1" Width="200" Background="Black" Foreground="Wheat"
-                                        FontWeight="Bold" TextAlignment="Center">
+                                        Grid.Column="1" Width="200"
+                                        FontWeight="Bold" TextAlignment="Center"
+                                        HorizontalAlignment="Stretch"
+                                        TextWrapping="NoWrap"
+                                        IsEnabled="{Binding !IsViewMode}">
                                     </TextBox>
-                                    <Button Grid.Column="2" Command="{Binding EstimationNoGoCommand}">Go</Button>
+                                    <Button Grid.Column="2" Classes="Outline" Command="{Binding EstimationNoGoCommand}">Go</Button>
                                 </Grid>
 
                                 <Grid Grid.Row="0" Grid.Column="2" ColumnDefinitions="Auto, *">
@@ -55,6 +67,8 @@
                                         ItemsSource="{Binding CollectedByList}"
                                         DisplayMemberBinding="{Binding Label}"
                                         IsTextSearchEnabled="True"
+                                        IsEnabled="{Binding !IsViewMode}"
+
                                         SelectedItem="{Binding SelectedCollectedBy, Mode=TwoWay}" />
                                 </Grid>
 
@@ -67,6 +81,8 @@
                                         ItemsSource="{Binding SessionList}"
                                         DisplayMemberBinding="{Binding Label}"
                                         IsTextSearchEnabled="True"
+                                        IsEnabled="{Binding !IsViewMode}"
+
                                         SelectedItem="{Binding SelectedSession, Mode=TwoWay}">
                                         <!-- <ComboBox.ItemTemplate> -->
                                         <!--     <DataTemplate> -->
@@ -86,12 +102,16 @@
                                         ItemsSource="{Binding BusinessUnitList}"
                                         DisplayMemberBinding="{Binding Label}"
                                         IsTextSearchEnabled="True"
+                                        IsEnabled="{Binding !IsViewMode}"
+
                                         SelectedItem="{Binding SelectedBusinessUnit, Mode=TwoWay}" />
                                 </Grid>
 
                                 <Grid Grid.Row="1" Grid.Column="2" ColumnDefinitions="Auto, *">
                                     <Label VerticalAlignment="Center" Width="110" HorizontalContentAlignment="Right">Sales Return VNo.</Label>
-                                    <TextBox Grid.Column="1" Text="{Binding SalesReturnVNo, Mode=TwoWay}"></TextBox>
+                                    <TextBox Grid.Column="1" Text="{Binding SalesReturnVNo, Mode=TwoWay}"
+                                             IsEnabled="{Binding !IsViewMode}">
+                                    </TextBox>
                                 </Grid>
 
                                 <Grid Grid.Row="2" Grid.Column="0" ColumnDefinitions="Auto, *">
@@ -101,6 +121,8 @@
                                         ItemsSource="{Binding PartyList}"
                                         DisplayMemberBinding="{Binding Label}"
                                         IsTextSearchEnabled="True"
+                                        IsEnabled="{Binding !IsViewMode}"
+
                                         SelectedItem="{Binding SelectedParty, Mode=TwoWay}" />
                                 </Grid>
 
@@ -111,12 +133,14 @@
                                         ItemsSource="{Binding CustomerList}"
                                         DisplayMemberBinding="{Binding Label}"
                                         IsTextSearchEnabled="True"
+                                        IsEnabled="{Binding !IsViewMode}"
+
                                         SelectedItem="{Binding SelectedCustomer, Mode=TwoWay}" />
                                 </Grid>
                                 <Grid Grid.Row="2" Grid.Column="2" ColumnDefinitions="Auto, *">
                                     <Label VerticalAlignment="Center" Width="110" HorizontalContentAlignment="Right">Sales Return Amt: </Label>
                                     <TextBox Grid.Column="1" Text="{Binding SalesReturnAmount, Mode=TwoWay}"
-                                             Background="Blue" Foreground="White">
+                                             IsEnabled="{Binding !IsViewMode}">
                                     </TextBox>
                                 </Grid>
                             </Grid>
@@ -127,8 +151,12 @@
                                       ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
                                     <StackPanel Grid.Column="0">
                                         <Label>P.Code</Label>
-                                        <TextBox Text="{Binding ProductCode, Mode=TwoWay}">
-                                           
+                                        <TextBox
+                                            Classes="compact"
+                                            HorizontalAlignment="Stretch"
+                                            TextWrapping="NoWrap"
+                                            Text="{Binding ProductCode, Mode=TwoWay}">
+
                                         </TextBox>
                                     </StackPanel>
                                     <StackPanel Grid.Column="1">
@@ -138,7 +166,7 @@
                                             ItemsSource="{Binding ProductList}"
                                             DisplayMemberBinding="{Binding Label}"
                                             IsTextSearchEnabled="True"
-                                            SelectedItem="{Binding SelectedProduct, Mode=TwoWay}" >
+                                            SelectedItem="{Binding SelectedProduct, Mode=TwoWay}">
                                             <ComboBox.KeyBindings>
                                                 <KeyBinding Command="{Binding ProductSearchDialogCommand}" Gesture="F5"></KeyBinding>
                                             </ComboBox.KeyBindings>
@@ -207,46 +235,101 @@
                                     <StackPanel Grid.Column="4" VerticalAlignment="Bottom">
                                         <CheckBox IsChecked="{Binding WholeQtyLp, Mode=TwoWay}">Whole Qty LP.</CheckBox>
                                     </StackPanel>
-                                    <Button Grid.Column="5" VerticalAlignment="Bottom" Command="{Binding MarketDemandCommand}">Market Demand</Button>
+                                    <Button Grid.Column="5" VerticalAlignment="Bottom"
+                                            Command="{Binding MarketDemandCommand}">
+                                        Market Demand
+                                    </Button>
                                     <StackPanel Grid.Column="6" Orientation="Horizontal" VerticalAlignment="Bottom"
                                                 HorizontalAlignment="Right">
-                                        <Button Background="LightGreen" Command="{Binding AddRowCommand}">Add</Button>
-                                        <Button Background="LightCoral" Command="{Binding ClearRowCommand}">Clear</Button>
+                                        <Button Background="LightGreen" Classes="Primary"
+                                                Command="{Binding AddRowCommand}">
+                                            Add
+                                        </Button>
+                                        <Button Background="LightCoral" Classes="Primary"
+                                                Command="{Binding ClearRowCommand}">
+                                            Clear
+                                        </Button>
                                     </StackPanel>
                                 </Grid>
                             </Grid>
                         </Border>
                         <Border Grid.Row="2" Height="200">
                             <DataGrid
-                                    GridLinesVisibility="All" 
-                                    Margin="0 10 0 10"
-                                    BorderBrush="Gray"
-                                    BorderThickness="1"
-                                    CanUserReorderColumns="True"
-                                    CanUserResizeColumns="True"
-                                    CanUserSortColumns="False"
-                                    ItemsSource="{Binding AddedProducts}"
-                                    >
+                                GridLinesVisibility="All"
+                                Margin="0 10 0 10"
+                                BorderBrush="Gray"
+                                BorderThickness="1"
+                                CanUserReorderColumns="True"
+                                CanUserResizeColumns="True"
+                                CanUserSortColumns="False"
+                                ItemsSource="{Binding AddedDetail}">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="P.Code" Binding="{Binding ProductCode}"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="Product Name" Binding="{Binding ProductTitle}"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="BarCode"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="Batch No"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="Expiry"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="Sl.Size"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="P.Size"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="Est Days."></DataGridTextColumn>
-                                    <DataGridTextColumn Header="D.Per Day"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="Est. Qty"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="Rate"></DataGridTextColumn>
-                                    <DataGridTextColumn Header="Gross Amt."></DataGridTextColumn>
-                                    <DataGridTextColumn Header="Disc."></DataGridTextColumn>
+                                    <DataGridTextColumn
+                                        IsReadOnly="True"
+                                        Header="P.Code"
+                                        Binding="{Binding ProductCode}">
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn
+                                        IsReadOnly="True"
+                                        Header="Product Name"
+                                        Binding="{Binding ProductTitle}">
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn
+                                        IsReadOnly="True"
+
+                                        Header="BarCode"
+                                        Binding="{Binding BarCodeStockID}">
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn
+                                        IsReadOnly="True"
+
+                                        Header="Batch No"
+                                        Binding="{Binding BatchNo}">
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn
+                                        IsReadOnly="True"
+
+                                        Header="Expiry"
+                                        Binding="{Binding ExpiryDate}">
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn
+                                        IsReadOnly="True"
+                                        Header="Sl.Size" Binding="{Binding StripSize}">
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn
+                                        IsReadOnly="True"
+                                        Header="P.Size" Binding="{Binding PackSize}">
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn
+                                        IsReadOnly="True"
+                                        Header="Est Days." Binding="{Binding EstimationDays}">
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn
+                                        IsReadOnly="True"
+                                        Header="D.Per Day">
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn
+                                        IsReadOnly="True"
+                                        Header="Est. Qty" Binding="{Binding EstimationUnitQty}">
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn
+                                        IsReadOnly="True"
+                                        Header="Rate" Binding="{Binding StockRate}">
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn
+                                        IsReadOnly="True"
+                                        Header="Gross Amt." Binding="{Binding Total}">
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn
+                                        IsReadOnly="True"
+                                        Header="Disc." Binding="{Binding MaxDiscount}">
+                                    </DataGridTextColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </Border>
                         <Border Grid.Row="3">
                             <Grid ColumnDefinitions="Auto, Auto, *" ColumnSpacing="10">
-                                <StackPanel Grid.Column="0" Spacing="-10">
+                                <StackPanel Grid.Column="0" Spacing="5">
                                     <CheckBox IsChecked="{Binding IsAutoPrintEstimation, Mode=TwoWay}">Auto Print Estimation</CheckBox>
                                     <CheckBox IsChecked="{Binding IsAutoCustomerToken, Mode=TwoWay}">Auto Customer Token</CheckBox>
                                     <CheckBox IsChecked="{Binding IsAutoPrintF7, Mode=TwoWay}">Auto Print F7</CheckBox>
@@ -255,15 +338,27 @@
                                     <StackPanel Orientation="Horizontal" Spacing="5">
                                         <StackPanel>
                                             <Label>Est.Days</Label>
-                                            <TextBox Text="{Binding EstimatedDays, Mode=TwoWay}"></TextBox>
+                                            <TextBox
+                                                IsEnabled="{Binding !IsViewMode}"
+
+                                                Text="{Binding EstimatedDays, Mode=TwoWay}">
+                                            </TextBox>
                                         </StackPanel>
                                         <StackPanel>
                                             <Label>Items</Label>
-                                            <TextBox Text="{Binding Items, Mode=TwoWay}"></TextBox>
+                                            <TextBox
+                                                IsEnabled="{Binding !IsViewMode}"
+
+                                                Text="{Binding Items, Mode=TwoWay}">
+                                            </TextBox>
                                         </StackPanel>
                                         <StackPanel>
                                             <Label>Items Qty</Label>
-                                            <TextBox Text="{Binding ItemsQty, Mode=TwoWay}"></TextBox>
+                                            <TextBox
+                                                IsEnabled="{Binding !IsViewMode}"
+
+                                                Text="{Binding ItemsQty, Mode=TwoWay}">
+                                            </TextBox>
                                         </StackPanel>
                                     </StackPanel>
                                 </StackPanel>
@@ -271,36 +366,46 @@
                                     <StackPanel Orientation="Horizontal" Spacing="5">
                                         <StackPanel>
                                             <Label>Est.Net Gross</Label>
-                                            <TextBox Text="{Binding EstimatedNetGrossAmount, Mode=TwoWay}" Background="Black" FontSize="24" Foreground="White"></TextBox>
+                                            <TextBox
+                                                IsEnabled="{Binding !IsViewMode}"
+
+                                                Text="{Binding EstimatedNetGrossAmount, Mode=TwoWay}">
+                                            </TextBox>
                                         </StackPanel>
                                         <StackPanel>
                                             <Label>LP.Value</Label>
-                                            <TextBox Text="{Binding LPValue, Mode=TwoWay}" Background="Yellow" FontSize="24" BorderBrush="Transparent"
-                                                     Foreground="White">
+                                            <TextBox Text="{Binding LPValue, Mode=TwoWay}"
+                                                     IsEnabled="{Binding !IsViewMode}">
                                             </TextBox>
                                         </StackPanel>
                                         <StackPanel>
                                             <Label>Sales Return</Label>
-                                            <TextBox Text="{Binding SalesReturnAmount, Mode=TwoWay}" Background="Blue" FontSize="24" BorderBrush="Transparent"
-                                                     Foreground="White">
+                                            <TextBox Text="{Binding SalesReturnAmount, Mode=TwoWay}"
+                                                     IsEnabled="{Binding !IsViewMode}">
                                             </TextBox>
                                         </StackPanel>
                                         <StackPanel>
                                             <Label>L.Max</Label>
-                                            <TextBox Text="{Binding LMax, Mode=TwoWay}"></TextBox>
+                                            <TextBox Text="{Binding LMax, Mode=TwoWay}"
+                                                     IsEnabled="{Binding !IsViewMode}">
+                                            </TextBox>
                                         </StackPanel>
                                         <StackPanel>
                                             <Label>Disc %</Label>
-                                            <TextBox Text="{Binding DiscountPercentage, Mode=TwoWay}"></TextBox>
+                                            <TextBox Text="{Binding DiscountPercentage, Mode=TwoWay}"
+                                                     IsEnabled="{Binding !IsViewMode}">
+                                            </TextBox>
                                         </StackPanel>
                                         <StackPanel>
                                             <Label>Est. Disc</Label>
-                                            <TextBox Text="{Binding EstimatedDiscountAmount, Mode=TwoWay}"></TextBox>
+                                            <TextBox Text="{Binding EstimatedDiscountAmount, Mode=TwoWay}"
+                                                     IsEnabled="{Binding !IsViewMode}">
+                                            </TextBox>
                                         </StackPanel>
                                         <StackPanel>
                                             <Label>Est. Amount</Label>
-                                            <TextBox Text="{Binding EstimatedTotalAmount, Mode=TwoWay}" Background="LightCoral" FontSize="24" BorderBrush="Transparent"
-                                                     Foreground="White">
+                                            <TextBox Text="{Binding EstimatedTotalAmount, Mode=TwoWay}"
+                                                     IsEnabled="{Binding !IsViewMode}">
                                             </TextBox>
                                         </StackPanel>
                                     </StackPanel>
@@ -309,18 +414,18 @@
                         </Border>
                         <Border Grid.Row="4">
                             <StackPanel Orientation="Horizontal" Spacing="5">
-                                <Button Command="{Binding FirstCommand}">First</Button>
-                                <Button Command="{Binding PreviousCommand}">Previous</Button>
-                                <Button Command="{Binding NextCommand}">Next</Button>
-                                <Button Command="{Binding LastCommand}">Last</Button>
-                                <Button Command="{Binding SaveAsyncCommand}">Save</Button>
-                                <Button Command="{Binding EditCommand}">Edit</Button>
-                                <Button Command="{Binding DeleteCommand}">Delete</Button>
-                                <Button Command="{Binding SearchCommand}">Search</Button>
-                                <Button Command="{Binding PrintCommand}">Print</Button>
-                                <Button Command="{Binding CancelCommand}">Cancel</Button>
-                                <Button Command="{Binding MaximizeCommand}">Maximize</Button>
-                                <CheckBox IsChecked="{Binding IsPrintStyleTwo, Mode=TwoWay}" >Print Style 2</CheckBox>
+                                <Button Classes="Secondary" Command="{Binding FirstCommand}">First</Button>
+                                <Button Classes="Secondary" Command="{Binding PreviousCommand}">Previous</Button>
+                                <Button Classes="Secondary" Command="{Binding NextCommand}">Next</Button>
+                                <Button Classes="Secondary" Command="{Binding LastCommand}">Last</Button>
+                                <Button Classes="Secondary" Command="{Binding SaveAsyncCommand}">Save</Button>
+                                <Button Classes="Secondary" Command="{Binding EditCommand}">Edit</Button>
+                                <Button Classes="Secondary" Command="{Binding DeleteCommand}">Delete</Button>
+                                <Button Classes="Secondary" Command="{Binding SearchCommand}">Search</Button>
+                                <Button Classes="Secondary" Command="{Binding PrintCommand}">Print</Button>
+                                <Button Classes="Secondary" Command="{Binding CancelCommand}">Cancel</Button>
+                                <Button Classes="Secondary" Command="{Binding MaximizeCommand}">Maximize</Button>
+                                <CheckBox IsChecked="{Binding IsPrintStyleTwo, Mode=TwoWay}">Print Style 2</CheckBox>
                             </StackPanel>
                         </Border>
                     </Grid>

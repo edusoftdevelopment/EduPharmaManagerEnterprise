@@ -1,19 +1,20 @@
-<Window xmlns="https://github.com/avaloniaui"
+<shadui:Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:shadui="clr-namespace:ShadUI;assembly=ShadUI"
         mc:Ignorable="d"
         d:DesignWidth="800" d:DesignHeight="450"
         x:Class="POSApp.Views.EstimationInfoWindow"
         Width="1180" Height="650"
-Name="EstimationInfo"
         xmlns:views="using:POSApp.Views"
         Title="Estimation Info"
         ShowInTaskbar="True"
         WindowStartupLocation="CenterScreen"
+        Tag="EstimationInfo"
         >
         
         
         <views:EstimationInfoView></views:EstimationInfoView>
         
-</Window>
+</shadui:Window>

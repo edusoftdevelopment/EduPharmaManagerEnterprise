@@ -1,28 +1,29 @@
-<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="using:POSApp.ViewModels"
-        x:DataType="vm:ProductSearchWindowViewModel"
-        mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="200"
-        Width="600" Height="400"
-        x:Class="POSApp.Views.ProductSearchWindow"
-        Title="Product Search"
-        WindowStartupLocation="CenterScreen"
-        >
-        <Grid RowDefinitions="Auto, *">
-                <TextBox Watermark="Search for any product" CornerRadius="0" Padding="5" >
-                        <TextBox.KeyBindings>
-                                <KeyBinding Command="{Binding SearchProductCommand}" Gesture="Enter"></KeyBinding>
-                        </TextBox.KeyBindings>
-                </TextBox>
-                <DataGrid Grid.Row="1" GridLinesVisibility="All"  BorderBrush="Black"
-                          BorderThickness="1">
-                        <DataGrid.Columns>
-                                <DataGridTextColumn Header="ProductCode"></DataGridTextColumn>
-                                <DataGridTextColumn Header="ProductType"></DataGridTextColumn>
-                                <DataGridTextColumn Width="*" Header="ProductTitleWithoutInitial"></DataGridTextColumn>
-                        </DataGrid.Columns>
-                </DataGrid> 
-        </Grid>
-</Window>
+<shadui:Window xmlns="https://github.com/avaloniaui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+               xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+               xmlns:vm="using:POSApp.ViewModels"
+               xmlns:shadui="clr-namespace:ShadUI;assembly=ShadUI"
+               x:DataType="vm:ProductSearchWindowViewModel"
+               mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="200"
+               Width="600" Height="400"
+               x:Class="POSApp.Views.ProductSearchWindow"
+               Title="Product Search"
+               WindowStartupLocation="CenterScreen">
+    <Grid RowDefinitions="Auto, *">
+        <TextBox Name="TbSearchQuery" Watermark="Search for any product" Text="{Binding SearchQuery, Mode=TwoWay}"
+                 CornerRadius="0" Padding="5">
+        </TextBox>
+
+        <DataGrid Grid.Row="1"
+                  SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
+                  GridLinesVisibility="All" BorderBrush="Black"
+                  BorderThickness="1" ItemsSource="{Binding FilteredProductList}">
+            <DataGrid.Columns>
+                <DataGridTextColumn IsReadOnly="True" Header="ProductCode" Binding="{Binding Id}"></DataGridTextColumn>
+                <DataGridTextColumn IsReadOnly="True" Header="ProductType" Binding="{Binding Label}"></DataGridTextColumn>
+                <DataGridTextColumn IsReadOnly="True" Width="*" Header="ProductTitleWithoutInitial"></DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</shadui:Window>

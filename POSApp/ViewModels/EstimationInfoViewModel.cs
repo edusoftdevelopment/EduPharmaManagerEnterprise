@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using POSApp.Data;
 using POSApp.Models;
@@ -12,11 +13,13 @@ using CommunityToolkit.Mvvm.Messaging;
 
 namespace POSApp.ViewModels;
 
-
 public partial class EstimationInfoViewModel : PageViewModel
 {
     #region Properties
+
     private readonly DropdownService _dropdownService;
+    private readonly AppStateViewModel _appStateViewModel;
+    private readonly EstimationInfoService _estimationInfoService;
     public IEnumerable<Dropdown<int>> CollectedByList { get; set; } = [];
     public IEnumerable<Dropdown<int>> SessionList { get; set; } = [];
     public IEnumerable<Dropdown<int>> BusinessUnitList { get; set; } = [];
@@ -24,16 +27,20 @@ public partial class EstimationInfoViewModel : PageViewModel
     public IEnumerable<Dropdown<int>> CustomerList { get; set; } = [];
     public IEnumerable<Dropdown<int>> ProductList { get; set; } = [];
     public IEnumerable<Dropdown<int>> StockHolderList { get; set; } = [];
-    
 
     #endregion
 
     #region Observables
-
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsViewMode))]
+    [NotifyPropertyChangedFor(nameof(IsEditMode))]
+    [NotifyPropertyChangedFor(nameof(IsNewMode))]
+    private FormMode _formMode = FormMode.View;
+    
     [ObservableProperty] private bool _isPrescriptionReceived;
     [ObservableProperty] private DateTime _selectedEntryDate = DateTime.Now;
     [ObservableProperty] private bool _isUnDeletable;
-    [ObservableProperty] private string _estimationNo;
+    [ObservableProperty] private long _estimationNo;
     [ObservableProperty] private Dropdown<int> _selectedCollectedBy;
     [ObservableProperty] private Dropdown<int> _selectedSession;
     [ObservableProperty] private Dropdown<int> _selectedBusinessUnit;
@@ -49,7 +56,7 @@ public partial class EstimationInfoViewModel : PageViewModel
     [ObservableProperty] private string _expiryDate;
     [ObservableProperty] private string _size;
     [ObservableProperty] private string _pSize;
-    [ObservableProperty] private string _estimatedDays;
+    [ObservableProperty] private byte _estimatedDays;
     [ObservableProperty] private string _doseOrDays;
     [ObservableProperty] private string _estimatedQty;
     [ObservableProperty] private string _price;
@@ -59,8 +66,8 @@ public partial class EstimationInfoViewModel : PageViewModel
     [ObservableProperty] private string _binLocation;
     [ObservableProperty] private bool _wholeQtyLp;
     [ObservableProperty] private Dropdown<int> _selectedStockHolder;
-    
-    public ObservableCollection<Product> AddedProducts { get; } = [];
+
+    public ObservableCollection<EstimationInfoDetail> AddedDetail { get; set; } = [];
 
     // Footer
     [ObservableProperty] private bool _isAutoPrintEstimation;
@@ -77,16 +84,29 @@ public partial class EstimationInfoViewModel : PageViewModel
     [ObservableProperty] private string _estimatedDiscountAmount;
     [ObservableProperty] private string _estimatedTotalAmount;
     [ObservableProperty] private bool _isPrintStyleTwo;
+    
+    
+    // Derived State
+    public bool IsViewMode => FormMode == FormMode.View;
+    public bool IsNewMode => FormMode == FormMode.New;
+    public bool IsEditMode => FormMode == FormMode.Edit;
 
     #endregion
 
     #region Constructors
-    public EstimationInfoViewModel(DropdownService dropdownService)
+
+    public EstimationInfoViewModel(
+        EstimationInfoService estimationInfoService,
+        DropdownService dropdownService,
+        AppStateViewModel appStateViewModel
+    )
     {
         PageName = ApplicationPageNames.EstimationInfo;
         _dropdownService = dropdownService;
-        
+        _appStateViewModel = appStateViewModel;
+        _estimationInfoService = estimationInfoService;
     }
+
     #endregion
 
     #region Methods
@@ -100,15 +120,67 @@ public partial class EstimationInfoViewModel : PageViewModel
     {
         CollectedByList = await _dropdownService.GetCollectedByList();
         SessionList = await _dropdownService.GetSessionList();
-        BusinessUnitList = await _dropdownService.GetBusinessUnitList();
+        BusinessUnitList = await _dropdownService.GetBusinessUnitList(_appStateViewModel.User!.DefaultBusinessUnitID);
         PartyList = await _dropdownService.GetPartyList();
         CustomerList = await _dropdownService.GetCustomerList();
         ProductList = await _dropdownService.GetProductsList();
         StockHolderList = await _dropdownService.GetStockHolderList();
     }
 
+    public async Task LoadRecordAsync()
+    {
+        var record = await _estimationInfoService.Load();
+
+        if (record != null)
+        {
+            if (record.EstimationDate != null)
+            {
+                SelectedEntryDate = record.EstimationDate.Value;
+            }   
+            if (record.EstimationNo != null)
+            {
+                EstimationNo = record.EstimationNo.Value;
+            }
+            IsUnDeletable = record.UnDeleteable;
+            
+            if (record.SessionID != null)
+            {
+                var match = SessionList.FirstOrDefault(x => x.Id == record.SessionID.Value);
+                if (match != null)
+                {
+                    SelectedSession = match;
+                }
+            }
+            
+            if (record.BusinessUnitID != null)
+            {
+                var match = BusinessUnitList.FirstOrDefault(x => x.Id == record.BusinessUnitID.Value);
+                if (match != null)
+                {
+                    SelectedSession = match;
+                }
+            }
+            
+            if (record.PartyID != null)
+            {
+                var match = PartyList.FirstOrDefault(x => x.Id == record.PartyID.Value);
+                if (match != null)
+                {
+                    SelectedParty = match;
+                }
+            }
+
+            if (record.EstimationDays != null)
+            {
+                EstimatedDays = record.EstimationDays.Value;
+            }
+            
+            AddedDetail = new ObservableCollection<EstimationInfoDetail>(record.Details);
+        }
+    }
+
     #endregion
-    
+
     #region Commands
 
     [RelayCommand]
@@ -129,7 +201,7 @@ public partial class EstimationInfoViewModel : PageViewModel
     [RelayCommand]
     private void AddRow()
     {
-        AddedProducts.Add(new Product {ProductId  = SelectedProduct.Id, ProductCode = ProductCode, ProductTitle = SelectedProduct.Label, ProductType = "Type"});
+        
     }
 
     [RelayCommand]
@@ -162,7 +234,6 @@ public partial class EstimationInfoViewModel : PageViewModel
     {
         var save = new
         {
-            
         };
     }
 
@@ -202,5 +273,6 @@ public partial class EstimationInfoViewModel : PageViewModel
         var product = await WeakReferenceMessenger.Default.Send(new SearchProductMessage());
         Debug.WriteLine(product);
     }
+
     #endregion
 }

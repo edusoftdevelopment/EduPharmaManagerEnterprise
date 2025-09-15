@@ -10,10 +10,11 @@ public class AppConfigService
 
     public string ApplicationName { get; } = "eduPharmaManagerEnterprise";
 
-    public string Server { get; private set; } = "";
+    private string Server { get; set; } = "";
     public string Database { get; private set; } = "";
-    public string UserName { get; private set; } = "";
-    public string Password { get; private set; } = "";
+    private string UserName { get; set; } = "";
+    private string Password { get; set; } = "";
+    public string DefaultConnectionString { get; private set; } = null!;
     public string ConnectionString { get; private set; } = null!;
 
     public bool Load()
@@ -39,7 +40,7 @@ public class AppConfigService
             if (string.IsNullOrEmpty(password)) return false;
             Password = password;
 
-            ConnectionString = BuildConnectionString(server, database, username, password);
+            DefaultConnectionString = BuildConnectionString(database);
             return true;
         }
         catch (Exception e)
@@ -51,9 +52,13 @@ public class AppConfigService
             return false;
         }
     }
-
-    private static string BuildConnectionString(string server, string database, string username, string password)
+    public void BuildAppConnectionString(string database)
     {
-        return $"Data Source={server};initial Catalog={database};Integrated Security=false;User Id={username};Password={password};Max Pool Size=32767;Connection Timeout=10;";
+        ConnectionString = BuildConnectionString(database);
+    }
+
+    private string BuildConnectionString(string database)
+    {
+        return $"Data Source=tcp:{Server};initial Catalog={database};Integrated Security=false;User Id={UserName};Password={Password};Max Pool Size=32767;Connection Timeout=10;Encrypt=False;TrustServerCertificate=True;";
     }
 }

@@ -1,6 +1,6 @@
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
-using Microsoft.Data.SqlClient;
 using POSApp.Helpers;
 using POSApp.Models;
 
@@ -8,26 +8,46 @@ namespace POSApp.Services;
 
 public interface ILoginService
 {
-    Task<AppUser> Login(string username, string password);
+    Task<AppUser?> Login(string username, string password);
+    Task CheckConnectionAsyc();
 }
 
-public class LoginService(DbHelper dbHelper) : ILoginService
+public class LoginService(DbHelper db) : ILoginService
 {
-    public async Task<AppUser> Login(string username, string password)
+    
+    
+    public async Task<AppUser?> Login(string username, string password)
     {
-        var appUser = new AppUser();
+        var users = await db.ExecuteQueryAsync<AppUser>("SELECT * FROM LoginInfo", r => new AppUser
+        {
+            LoginId = r.GetInt32(r.GetOrdinal("LoginId")),
+            LoginName = r.GetString(r.GetOrdinal("LoginName")),
+            Password = r.GetString(r.GetOrdinal("Password")),
+            LoginType = r.GetString(r.GetOrdinal("LoginType")),
+            BackSessionWorkingAllowed = r.GetBoolean(r.GetOrdinal("BackSessionWorkingAllowed")),
+            BackDateWorkingAllowed = r.IsDBNull(r.GetOrdinal("BackDateWorkingAllowed")) 
+                ? false
+                : r.GetBoolean(r.GetOrdinal("BackDateWorkingAllowed")),
+            DefaultBusinessUnitID = r.IsDBNull(r.GetOrdinal("DefaultBusinessUnitID")) 
+                ? 0 
+                : r.GetInt32(r.GetOrdinal("DefaultBusinessUnitID")),
+        });
 
-        if (username == "admin" && password == "bismillah")
+        
+        foreach (var user in users)
         {
-            
-        }
-        else
-        {
-            throw new Exception("Invalid username or password");
+            if (EncryptionHelper.eduDecrypt(user.LoginName) == username &&
+                EncryptionHelper.eduDecrypt(user.Password) == password)
+            {
+                return user;    
+            }
         }
         
-        // await dbHelper.ExecuteNonQueryAsync("", new SqlParameter("username", username), new SqlParameter("password", password));
-         return appUser;
-        
+        return null;
+    }
+
+    public async Task CheckConnectionAsyc()
+    {
+        await db.CheckConnectionAsync();
     }
 }

@@ -1,7 +1,8 @@
-<Window xmlns="https://github.com/avaloniaui"
+<shadui:Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:shadui="clr-namespace:ShadUI;assembly=ShadUI"
         mc:Ignorable="d"
         x:Class="POSApp.Views.ConfigurationErrorWindow"
         Title="Configuration Error"
@@ -11,7 +12,7 @@
 
     <Border Padding="20" Margin="10"
             CornerRadius="10"
-            BorderBrush="DarkRed"
+            BorderBrush="{DynamicResource ErrorColor}"
             BorderThickness="2"
             Background="#FFF8F8">
 
@@ -19,7 +20,7 @@
             <TextBlock Text="⚠ Configuration Error"
                        FontSize="18"
                        FontWeight="Bold"
-                       Foreground="DarkRed"
+                       Foreground="{DynamicResource ErrorColor}"
                        HorizontalAlignment="Center" />
 
             <TextBlock Text="The configuration file was not found. 
@@ -32,4 +33,4 @@ Make sure you set up this application correctly."
 
         </StackPanel>
     </Border>
-</Window>
+</shadui:Window>

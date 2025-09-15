@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Notifications;
@@ -15,23 +16,13 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     [ObservableProperty] private bool _isSidebarOpen = true;
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CurrentPage))]
-    [NotifyPropertyChangedFor(nameof(IsEstimationActive))]
-    [NotifyPropertyChangedFor(nameof(IsSalesInfoActive))]
-    private ApplicationPageNames _currentPageKey = ApplicationPageNames.HomePage;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsEstimationActive))]
+    private ApplicationPageNames _currentPageKey = ApplicationPageNames.EstimationInfo;
 
     public bool IsEstimationActive => CurrentPageKey == ApplicationPageNames.EstimationInfo;
-    public bool IsSalesInfoActive => CurrentPageKey == ApplicationPageNames.SalesInfo;
 
     private readonly PageFactory _pageFactory;
-    public PageViewModel CurrentPage => _pageFactory.GetPage(CurrentPageKey);
 
-    
-    public MainWindowViewModel()
-    {
-    }
-    
     public MainWindowViewModel(PageFactory pageFactory)
     {
         _pageFactory = pageFactory;
@@ -59,21 +50,42 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             foreach (var window in desktop.Windows)
             {
-                if (window.Name == "EstimationInfo")
+                if (window.Tag != null)
                 {
-                    window.Activate();
-                    return;
+                    if ((string)window.Tag == "EstimationInfoKey")
+                    {
+                        window.Activate();
+                        return;
+                    }
                 }
             }
         }
-        if (_pageFactory.GetPage(ApplicationPageNames.EstimationInfo) is EstimationInfoViewModel viewModel)
+
+        if (_pageFactory.GetPage(ApplicationPageNames.LoadingSplash) is LoadingSplashWindowViewModel viewModel)
         {
-            await viewModel.InitializeAsync();
-            var window = new EstimationInfoWindow()
+            var window = new LoadingSplashWindow
             {
                 DataContext = viewModel
             };
             window.Show();
+
+            var result = await viewModel.ShowEstimationInfoPage();
+            if (result)
+            {
+                Debug.WriteLine("Splash Window Closed...");
+
+                window.Close();
+            }
         }
+
+        // if (_pageFactory.GetPage(ApplicationPageNames.EstimationInfo) is EstimationInfoViewModel viewModel)
+        // {
+        //     await viewModel.InitializeAsync();
+        //     var window = new EstimationInfoWindow()
+        //     {
+        //         DataContext = viewModel
+        //     };
+        //     window.Show();
+        // }
     }
 }

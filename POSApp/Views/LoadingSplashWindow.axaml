@@ -1,0 +1,76 @@
+<shadui:Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        x:Class="POSApp.Views.LoadingSplashWindow"
+        xmlns:vm="using:POSApp.ViewModels"
+        x:DataType="vm:LoadingSplashWindowViewModel"
+        Title="Loading..."
+        xmlns:shadui="clr-namespace:ShadUI;assembly=ShadUI"
+        Width="400" Height="230"
+        WindowStartupLocation="CenterScreen"
+        CanResize="{Binding HasError}"
+        ShowInTaskbar="{Binding HasError}"
+        Background="#F5F5F5"
+        SystemDecorations="{Binding SystemDecoration}"
+        TransparencyLevelHint="AcrylicBlur, Blur, Transparent">
+
+    <Border Padding="20"
+            Background="#FFFFFF"
+            CornerRadius="10">
+        
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <StackPanel VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        Spacing="14"
+                        Margin="0,10">
+
+                <!-- Title (Loading) -->
+                <TextBlock Text="⏳ Please wait..."
+                           FontSize="18"
+                           FontWeight="SemiBold"
+                           Foreground="#2E3A59"
+                           IsVisible="{Binding !HasError}"
+                           HorizontalAlignment="Center" />
+
+                <!-- Title (Error) -->
+                <TextBlock Text="❌ Something went wrong"
+                           FontSize="18"
+                           FontWeight="Bold"
+                           Foreground="#C62828"
+                           IsVisible="{Binding HasError}"
+                           HorizontalAlignment="Center" />
+
+                <!-- Loading Message -->
+                <TextBlock Text="{Binding LoadingText}"
+                           FontSize="14"
+                           TextWrapping="Wrap"
+                           TextAlignment="Center"
+                           Foreground="#444"
+                           IsVisible="{Binding !HasError}"
+                           MaxWidth="360"
+                           Margin="10,0,10,0" />
+
+                <!-- Error Message -->
+                <SelectableTextBlock Text="{Binding ErrorText}"
+                           FontSize="14"
+                           TextWrapping="Wrap"
+                           Foreground="#B00020"
+                           IsVisible="{Binding HasError}"
+                           
+                           MaxWidth="360"
+                           Margin="10,0,10,0" />
+
+                <!-- ProgressBar -->
+                <ProgressBar IsVisible="{Binding !HasError}"
+                             IsIndeterminate="True"
+                             Height="6"
+                             Foreground="#1976D2"
+                             Margin="0,10,0,0"
+                             CornerRadius="3" />
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
+</shadui:Window>

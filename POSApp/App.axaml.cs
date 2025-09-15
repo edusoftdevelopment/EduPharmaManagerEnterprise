@@ -1,6 +1,7 @@
 using System.Linq;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
@@ -24,22 +25,32 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        _ = InitializeUiAsync();
+        base.OnFrameworkInitializationCompleted();
+    }
+
+    private async Task InitializeUiAsync()
+    {
         var services = new ServiceCollection();
 
         services.AddSingleton<MainWindowViewModel>();
         services.AddSingleton<AppStateViewModel>();
         services.AddSingleton<AppConfigService>();
+        services.AddSingleton<DbHelper>();
+        services.AddSingleton<CacheService>();
 
-        services.AddScoped<DbHelper>();
         services.AddScoped<DropdownService>();
         services.AddScoped<ILoginService, LoginService>();
+        services.AddScoped<EstimationInfoService>();
 
         services.AddTransient<LoginWindowViewModel>();
         services.AddTransient<EstimationInfoViewModel>();
+        services.AddTransient<LoadingSplashWindowViewModel>();
 
         services.AddSingleton<Func<ApplicationPageNames, PageViewModel>>(x => name => name switch
         {
             ApplicationPageNames.EstimationInfo => x.GetRequiredService<EstimationInfoViewModel>(),
+            ApplicationPageNames.LoadingSplash => x.GetRequiredService<LoadingSplashWindowViewModel>(),
             _ => throw new ArgumentOutOfRangeException(nameof(name), name, null)
         });
         services.AddSingleton<PageFactory>();
@@ -47,41 +58,59 @@ public partial class App : Application
         var provider = services.BuildServiceProvider();
 
         var configService = provider.GetRequiredService<AppConfigService>();
-        var hasConnection = configService.Load();
+        var hasConfigurationFile = configService.Load();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             DisableAvaloniaDataAnnotationValidation();
 
-            if (hasConnection)
+            if (hasConfigurationFile)
             {
-                var dbHelper = provider.GetRequiredService<DbHelper>();
-                dbHelper.SetConnectionString(configService.ConnectionString);
-
                 var appStateViewModel = provider.GetRequiredService<AppStateViewModel>();
                 if (appStateViewModel.User is null)
                 {
-                    var loginViewModel = provider.GetRequiredService<LoginWindowViewModel>();
-                     loginViewModel.InitializeAsync().GetAwaiter().GetResult();
-
-                    var loginWindow = new LoginWindowView()
+                    var loadingSplashWindowViewModel = provider.GetRequiredService<LoadingSplashWindowViewModel>();
+                    var loadingSplashWindow = new LoadingSplashWindow
                     {
-                        DataContext = loginViewModel
+                        DataContext = loadingSplashWindowViewModel
                     };
+                    loadingSplashWindowViewModel.LoadingText = "Checking Database Connection...";
+                    loadingSplashWindow.Show();
 
-                    loginViewModel.OnLoginSucceeded += (sender, args) =>
+                    try
                     {
-                        var mainWindow = new MainWindow
+                        var loginViewModel = provider.GetRequiredService<LoginWindowViewModel>();
+                        
+                        await loginViewModel.CheckConnection();
+
+                        loadingSplashWindowViewModel.LoadingText = "Preparing Login Page...";
+                        await loginViewModel.Initialize();
+
+                        var loginWindow = new LoginWindowView()
                         {
-                            DataContext = provider.GetRequiredService<MainWindowViewModel>(),
+                            DataContext = loginViewModel
                         };
-                        mainWindow.Show();
-                       // loginWindow.Close();
-                        desktop.MainWindow = mainWindow;
-                    };
 
-                    desktop.MainWindow = loginWindow;
-              //      loginWindow.Show();
+                        loginViewModel.OnLoginSucceeded += (sender, args) =>
+                        {
+                            var mainWindow = new MainWindow
+                            {
+                                DataContext = provider.GetRequiredService<MainWindowViewModel>(),
+                            };
+                            mainWindow.Show();
+                            loginWindow.Close();
+                            desktop.MainWindow = mainWindow;
+                        };
+
+                        desktop.MainWindow = loginWindow;
+                        loginWindow.Show();
+                        loadingSplashWindow.Close();
+                    }
+                    catch (Exception e)
+                    {
+                        loadingSplashWindowViewModel.ErrorText = e.ToString();
+                        desktop.MainWindow = loadingSplashWindow;
+                    }
                 }
                 else
                 {
@@ -96,8 +125,6 @@ public partial class App : Application
                 desktop.MainWindow = new ConfigurationErrorWindow();
             }
         }
-
-        base.OnFrameworkInitializationCompleted();
     }
 
     private void DisableAvaloniaDataAnnotationValidation()

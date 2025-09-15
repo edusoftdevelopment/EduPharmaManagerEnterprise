@@ -1,35 +1,32 @@
-<Window xmlns="https://github.com/avaloniaui"
+<shadui:Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:POSApp.ViewModels"
-        xmlns:views="using:POSApp.Views"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:shadui="clr-namespace:ShadUI;assembly=ShadUI"
         mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="600"
         Width="1400" Height="900"
+        
         x:Class="POSApp.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Canary">
-
-    <Design.DataContext>
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
-
-
-    <Grid ColumnDefinitions="Auto, *">
+        Title="Edu Pharma Manager"
+        WindowState="Maximized"
+        
+        >
     
-        <ContentControl Grid.Column="1" Content="{Binding CurrentPage}">
-        </ContentControl>
+    <Grid ColumnDefinitions="Auto">
     
-        <Border BorderBrush="LightGray" BorderThickness="2" Grid.Column="0" Padding="20" >
+    
+        <Border Grid.Column="0" Padding="20" >
             <Grid RowDefinitions="*,Auto">
                 <StackPanel Spacing="12" >
-                    <Button Command="{Binding ToggleSidebarCommand}" Grid.Row="1">
+                    <Button Classes="Primary" Command="{Binding ToggleSidebarCommand}" Grid.Row="1">
                         <StackPanel Orientation="Horizontal">
                             <Image HorizontalAlignment="Left" Source="{SvgImage /Assets/Images/logo.svg}" Width="20" Height="20"></Image>
                         </StackPanel>
                     </Button>
-                    <Button Classes.active="{Binding IsEstimationActive}" HorizontalAlignment="Stretch" Command="{Binding GoToEstimationInfoCommand}" >
+                    <Button Classes="Primary" HorizontalAlignment="Stretch" Command="{Binding GoToEstimationInfoCommand}" >
                         <StackPanel Orientation="Horizontal">
                             <Image HorizontalAlignment="Left" Source="{SvgImage /Assets/Images/logo.svg}" Width="20" Height="20"></Image>
                             <Label IsVisible="{Binding IsSidebarOpen}">
@@ -39,7 +36,7 @@
                     </Button>
                 </StackPanel>
                 
-                <Button Grid.Row="1">
+                <Button Classes="Primary" Grid.Row="1">
                     <StackPanel Orientation="Horizontal">
                         <Image HorizontalAlignment="Left" Source="{SvgImage /Assets/Images/logo.svg}" Width="20" Height="20"></Image>
                         <Label IsVisible="{Binding IsSidebarOpen}">
@@ -50,4 +47,4 @@
             </Grid>
         </Border>
     </Grid>
-</Window>
+</shadui:Window>
