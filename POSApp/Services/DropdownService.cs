@@ -17,7 +17,7 @@ public class DropdownService(
     DbHelper dbHelper,
     AppConfigService appConfigService,
     CacheService cacheService
-    )
+)
 {
     public Task<IEnumerable<Dropdown<string>>> GetDefaultDatabases()
     {
@@ -33,23 +33,30 @@ public class DropdownService(
         });
     }
 
-    public Task<IEnumerable<Dropdown<int>>> GetCollectedByList()
+    public Task<IEnumerable<Dropdown<int>>> GetCollectedByList(
+        int businessUnitId = 0)
     {
-        return Task.FromResult<IEnumerable<Dropdown<int>>>(new List<Dropdown<int>>
+        string query =
+            $"SELECT EmployeeCode, EmployeeName FROM gen_EmployeesInfo WHERE SalariedEmployee=1 AND Collecter=1 AND discontinue=0 {(businessUnitId != 0 ? " AND businessUnitID=@businessUnitID " : "")} ORDER BY EmployeeName";
+        
+        return dbHelper.ExecuteQueryAsync(query, row => new Dropdown<int>
         {
-            new() { Id = 1, Label = "Edusoft" },
-            new() { Id = 2, Label = "Paragmtic" },
-            new() { Id = 3, Label = "Techno Phile" }
+            Id = row.GetInt32(row.GetOrdinal("EmployeeCode")),
+            Label = row.GetString(row.GetOrdinal("EmployeeName")),
+        }, new SqlParameter
+        {
+            ParameterName = "@businessUnitID",
+            Value = businessUnitId
         });
     }
 
 
-    public Task<IEnumerable<Dropdown<int>> > GetBusinessUnitList(
-        int DefaultBusinessUnitID = 0)
+    public Task<IEnumerable<Dropdown<int>>> GetBusinessUnitList(
+        int defaultBusinessUnitId = 0)
     {
         var query = "SELECT BusinessUnitID, BusinessUnitTitle FROM gen_BusinessUnitInfo";
 
-        if (DefaultBusinessUnitID != 0)
+        if (defaultBusinessUnitId != 0)
         {
             query += $" WHERE BusinessUnitID = @DefaultBusinessUnitID";
         }
@@ -61,17 +68,17 @@ public class DropdownService(
         }, new SqlParameter
         {
             ParameterName = "@DefaultBusinessUnitID",
-            Value = DefaultBusinessUnitID
+            Value = defaultBusinessUnitId
         });
     }
 
     public Task<IEnumerable<Dropdown<int>>> GetSessionList()
     {
-        return Task.FromResult<IEnumerable<Dropdown<int>>>(new List<Dropdown<int>>
+        const string query = " Select SessionID, 'TEST' SessionTitle  from SessionInfo Where currentSession = 1";
+        return dbHelper.ExecuteQueryAsync(query, row => new Dropdown<int>
         {
-            new() { Id = 1, Label = "Spring 2023" },
-            new() { Id = 2, Label = "Fall 2023" },
-            new() { Id = 3, Label = "Winter 2024" }
+            Id = row.GetByte(row.GetOrdinal("SessionID")),
+            Label = row.GetString(row.GetOrdinal("SessionTitle")),
         });
     }
 
@@ -85,19 +92,10 @@ public class DropdownService(
         });
     }
 
-    public Task<IEnumerable<Dropdown<int>>> GetCustomerList()
-    {
-        return Task.FromResult<IEnumerable<Dropdown<int>>>(new List<Dropdown<int>>
-        {
-            new() { Id = 1, Label = "Alice" },
-            new() { Id = 2, Label = "Bob" },
-            new() { Id = 3, Label = "Charlie" }
-        });
-    }
-
     public async Task<IEnumerable<Dropdown<int>>> GetProductsList()
     {
-        const string query = " SELECT ProductID, ProductTitle From vw_ProductsInfo WHERE Discontinue = 0 AND SalesStop = 0 AND PRODUCTID NOT IN(SELECT PRODUCTId FROM gen_ProductsInfo WHERE (gen_ProductsInfo.BrandID IN (SELECT ManufacturerID FROM data_StockTakingInfo WHERE Status = 'InProcess')) ) ORDER BY ProductTitle";
+        const string query =
+            " SELECT ProductID, ProductTitle From vw_ProductsInfo WHERE Discontinue = 0 AND SalesStop = 0 AND PRODUCTID NOT IN(SELECT PRODUCTId FROM gen_ProductsInfo WHERE (gen_ProductsInfo.BrandID IN (SELECT ManufacturerID FROM data_StockTakingInfo WHERE Status = 'InProcess')) ) ORDER BY ProductTitle";
 
         var products = (await dbHelper.ExecuteQueryAsync(query, reader => new Dropdown<int>
         {
@@ -106,7 +104,7 @@ public class DropdownService(
         })).ToList();
 
         cacheService.Set("products", products);
-        
+
         return products;
     }
 

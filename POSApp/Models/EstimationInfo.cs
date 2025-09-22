@@ -73,4 +73,5 @@ public class EstimationInfoDetail
     public bool ExcludeFromSales { get; set; }    
     
     public decimal Total => (UnitQty ?? 0) * (StockRate ?? 0);
+    public string FormattedExpiryDate => ExpiryDate?.ToString("dd-MMM-yyyy") ?? string.Empty;
 }

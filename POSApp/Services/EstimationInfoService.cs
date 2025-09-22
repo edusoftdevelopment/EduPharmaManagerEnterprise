@@ -8,11 +8,13 @@ using Microsoft.Data.SqlClient;
 using POSApp.Extensions;
 using POSApp.Helpers;
 using POSApp.Models;
+using SkiaSharp;
 
 namespace POSApp.Services;
 
 public class EstimationInfoService(
-    DbHelper db
+    DbHelper db,
+    QueryHelper queryHelper
 )
 {
     public Task<IEnumerable<EstimationInfo>> LoadAll()
@@ -56,13 +58,19 @@ public class EstimationInfoService(
         );
     }
 
-
-    public async Task<EstimationInfo?> Load()
+    public async Task<MasterInfo<EstimationInfo>> Load(
+        string tableName,
+        string masterIdFieldName,
+        MoveDirection moveDirection,
+        string whereClause = "",
+        long currentRecordId = 0)
     {
         string query =
-            "SELECT data_EstimationInfo.EstimationID, data_EstimationInfo.EstimationNo, data_EstimationInfo.EstimationDate, data_EstimationInfo.SessionID, data_EstimationInfo.BusinessUnitID, data_EstimationInfo.PartyID, data_EstimationInfo.CustomerName, data_EstimationInfo.DoctorId, data_EstimationInfo.DoctorName, data_EstimationInfo.PatientName, data_EstimationInfo.PrescriptionDate, data_EstimationInfo.Gender, data_EstimationInfo.Age, data_EstimationInfo.EstimationDays, data_EstimationInfo.Symptoms, data_EstimationInfo.Diagnose, data_EstimationInfo.GrossAmount, data_EstimationInfo.NewRecordByEmployeeID, data_EstimationInfo.NewRecordDateTime, data_EstimationInfo.ModifyRecordByEmployeeID, data_EstimationInfo.ModifyRecordDateTime, Employees.EmployeeName AS EnterByEmployeeName, Employees_1.EmployeeName AS ModifiedByEmployeeName, data_EstimationInfo.UnDeleteable, data_EstimationInfo.SaleReturnID, pMaxDiscount, data_EstimationInfo.MobileNo, data_EstimationInfo.BuyerName, data_EstimationInfo.CollectedById, data_EstimationInfo.PrescriptionReceived FROM data_EstimationInfo LEFT OUTER JOIN Employees ON data_EstimationInfo.NewRecordByEmployeeID = Employees.EmployeeCode LEFT OUTER JOIN Employees Employees_1 ON data_EstimationInfo.ModifyRecordByEmployeeID = Employees_1.EmployeeCode WHERE (data_EstimationInfo.EstimationID > 0) AND (data_EstimationInfo.Saved = 1)";
+            "SELECT data_EstimationInfo.EstimationID, data_EstimationInfo.EstimationNo, data_EstimationInfo.EstimationDate, data_EstimationInfo.SessionID, data_EstimationInfo.BusinessUnitID, data_EstimationInfo.PartyID, data_EstimationInfo.CustomerName, data_EstimationInfo.DoctorId, data_EstimationInfo.DoctorName, data_EstimationInfo.PatientName, data_EstimationInfo.PrescriptionDate, data_EstimationInfo.Gender, data_EstimationInfo.Age, data_EstimationInfo.EstimationDays, data_EstimationInfo.Symptoms, data_EstimationInfo.Diagnose, data_EstimationInfo.GrossAmount, data_EstimationInfo.NewRecordByEmployeeID, data_EstimationInfo.NewRecordDateTime, data_EstimationInfo.ModifyRecordByEmployeeID, data_EstimationInfo.ModifyRecordDateTime, Employees.EmployeeName AS EnterByEmployeeName, Employees_1.EmployeeName AS ModifiedByEmployeeName, data_EstimationInfo.UnDeleteable, data_EstimationInfo.SaleReturnID, pMaxDiscount, data_EstimationInfo.MobileNo, data_EstimationInfo.BuyerName, data_EstimationInfo.CollectedById, data_EstimationInfo.PrescriptionReceived FROM data_EstimationInfo LEFT OUTER JOIN Employees ON data_EstimationInfo.NewRecordByEmployeeID = Employees.EmployeeCode LEFT OUTER JOIN Employees Employees_1 ON data_EstimationInfo.ModifyRecordByEmployeeID = Employees_1.EmployeeCode WHERE 0=0 ";
 
-        var records = (await db.ExecuteQueryAsync(query, reader => new EstimationInfo
+
+        var result = await queryHelper.GetMasterInfo(
+            query, tableName, masterIdFieldName, moveDirection, reader => new EstimationInfo
             {
                 EstimationID = reader.GetInt64(reader.GetOrdinal("EstimationID")),
                 EstimationNo = reader.GetNullable<long>("EstimationNo"),
@@ -94,18 +102,13 @@ public class EstimationInfoService(
                 BuyerName = reader["BuyerName"] as string,
                 CollectedById = reader.GetNullable<int>("CollectedById"),
                 PrescriptionReceived = reader.GetBoolean(reader.GetOrdinal("PrescriptionReceived"))
-            }
-        )).ToList();
+            }, currentRecordId: currentRecordId
+        );
 
-        if (records.Count > 0)
-        {
-            var record = records.First();
-            var detail = await LoadDetail(record.EstimationID);
-            record.Details = detail;
-            return record;
-        }
 
-        return null;
+        var detail = await LoadDetail(result.Data.EstimationID);
+        result.Data.Details = detail;
+        return result;
     }
 
     private Task<IEnumerable<EstimationInfoDetail>> LoadDetail(long EstimationID)
@@ -148,6 +151,20 @@ public class EstimationInfoService(
                 TemperatureSensitive = reader.GetNullable<bool>("TemperatureSensitive"),
             },
             new SqlParameter { ParameterName = "@EstimationID", Value = EstimationID });
+    }
+
+    public async Task<string> GetHostID()
+    {
+        var row = await db.ExecuteQueryAsync("SELECT HOST_ID() HostID", reader => reader.GetString(0));
+        return row.First();
+    }
+
+
+    // TODO: May get in common
+    public async Task<int> GetTotalRecordsCount(string table, string whereClause = "")
+    {
+        var query = $"Select Count(*) as RecCount From {table} {whereClause}";
+        return (await db.ExecuteQueryAsync(query, reader => reader.GetInt32(0))).First();
     }
 }
 

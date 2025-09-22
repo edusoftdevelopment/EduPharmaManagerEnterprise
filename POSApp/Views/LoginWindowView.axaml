@@ -1,17 +1,17 @@
 <shadui:Window xmlns="https://github.com/avaloniaui"
-               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-               xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-               xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-               mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
-               xmlns:shadui="clr-namespace:ShadUI;assembly=ShadUI"
-               Width="600"
-               Height="400"
-               x:Class="POSApp.Views.LoginWindowView"
-               xmlns:vm="using:POSApp.ViewModels"
-               x:DataType="vm:LoginWindowViewModel"
-               Title="Login Page"
-               Focusable="True"
-               WindowStartupLocation="CenterScreen">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+       xmlns:shadui="clr-namespace:ShadUI;assembly=ShadUI"  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
+
+        Width="600"
+        Height="400"
+        x:Class="POSApp.Views.LoginWindowView"
+        xmlns:vm="using:POSApp.ViewModels"
+        x:DataType="vm:LoginWindowViewModel"
+        Title="Login Page"
+        Focusable="True"
+        WindowStartupLocation="CenterScreen">
 
     <Window.KeyBindings>
         <KeyBinding Command="{Binding LoginCommand}" Gesture="Enter"></KeyBinding>
@@ -25,10 +25,10 @@
             <!-- <Border Background="{" CornerRadius="5" Padding="10" IsVisible="{Binding HasError}"> -->
             <!--     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="5"> -->
             <!--         <TextBlock Text="{Binding ErrorMessage}" FontWeight="500" Foreground="White"></TextBlock> -->
-            <!--         <Button FontSize="10" Foreground="White" Command="{Binding ResetErrorCommand}">Close</Button> -->
+            <!--         <Button Classes="Primary" FontSize="10" Foreground="White" Command="{Binding ResetErrorCommand}">Close</Button> -->
             <!--     </StackPanel> -->
             <!-- </Border> -->
-            <TextBlock HorizontalAlignment="Center">Login</TextBlock>
+            <TextBlock HorizontalAlignment="Center" Classes="h1">Login</TextBlock>
             <StackPanel Margin="0 10 0 10">
                 <StackPanel>
                     <Label>Username</Label>
@@ -48,14 +48,12 @@
                         SelectedItem="{Binding SelectedDatabase, Mode=TwoWay}" />
                 </StackPanel>
             </StackPanel>
-            <Button
-                Classes="Primary"
-                shadui:ButtonAssist.ShowProgress="{Binding IsPending}"
+            <Button Classes="Primary"
+
                 IsEnabled="{Binding !IsPending}"
                 HorizontalAlignment="Stretch"
                 HorizontalContentAlignment="Center"
-                Command="{Binding LoginCommand
-                        }">
+                Command="{Binding LoginCommand}">
                 Login
             </Button>
         </StackPanel>

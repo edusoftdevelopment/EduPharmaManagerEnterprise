@@ -17,6 +17,8 @@ public partial class EstimationInfoWindow : Window
         
         WeakReferenceMessenger.Default.Register<EstimationInfoWindow, SearchProductMessage>(this, static (w, m) =>
         {
+            if (!w.IsActive) return;
+            
             var vm = w.DataContext as EstimationInfoViewModel;
             var dialog = new ProductSearchWindow
             {
@@ -24,5 +26,7 @@ public partial class EstimationInfoWindow : Window
             };
             m.Reply(dialog.ShowDialog<Product?>(w));
         });
+        
+        Closed += (_, _) => WeakReferenceMessenger.Default.Unregister<SearchProductMessage>(this);
     }
 }

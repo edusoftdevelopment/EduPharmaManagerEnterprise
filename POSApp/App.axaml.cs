@@ -13,6 +13,7 @@ using POSApp.Services;
 using POSApp.ViewModels;
 using POSApp.Views;
 using Microsoft.Extensions.DependencyInjection;
+using ShadUI;
 
 namespace POSApp;
 
@@ -38,6 +39,9 @@ public partial class App : Application
         services.AddSingleton<AppConfigService>();
         services.AddSingleton<DbHelper>();
         services.AddSingleton<CacheService>();
+        services.AddSingleton<QueryHelper>();
+        services.AddSingleton<DialogManager>();
+        services.AddSingleton<ToastManager>();
 
         services.AddScoped<DropdownService>();
         services.AddScoped<ILoginService, LoginService>();

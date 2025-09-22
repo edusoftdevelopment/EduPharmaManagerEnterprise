@@ -7,9 +7,7 @@ namespace POSApp.Services;
 public class AppConfigService
 {
     private const string FilePath = "Config.ini";
-
     public string ApplicationName { get; } = "eduPharmaManagerEnterprise";
-
     private string Server { get; set; } = "";
     public string Database { get; private set; } = "";
     private string UserName { get; set; } = "";

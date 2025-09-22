@@ -2,8 +2,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:POSApp.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:shadui="clr-namespace:ShadUI;assembly=ShadUI"
+       xmlns:shadui="clr-namespace:ShadUI;assembly=ShadUI"  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        
         mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="600"
         Width="1400" Height="900"
         
@@ -16,17 +16,15 @@
         >
     
     <Grid ColumnDefinitions="Auto">
-    
-    
         <Border Grid.Column="0" Padding="20" >
             <Grid RowDefinitions="*,Auto">
                 <StackPanel Spacing="12" >
-                    <Button Classes="Primary" Command="{Binding ToggleSidebarCommand}" Grid.Row="1">
+                    <Button Classes="Primary"  Command="{Binding ToggleSidebarCommand}" Grid.Row="1">
                         <StackPanel Orientation="Horizontal">
                             <Image HorizontalAlignment="Left" Source="{SvgImage /Assets/Images/logo.svg}" Width="20" Height="20"></Image>
                         </StackPanel>
                     </Button>
-                    <Button Classes="Primary" HorizontalAlignment="Stretch" Command="{Binding GoToEstimationInfoCommand}" >
+                    <Button Classes="Primary"  HorizontalAlignment="Stretch" Command="{Binding GoToEstimationInfoCommand}" >
                         <StackPanel Orientation="Horizontal">
                             <Image HorizontalAlignment="Left" Source="{SvgImage /Assets/Images/logo.svg}" Width="20" Height="20"></Image>
                             <Label IsVisible="{Binding IsSidebarOpen}">
@@ -36,7 +34,7 @@
                     </Button>
                 </StackPanel>
                 
-                <Button Classes="Primary" Grid.Row="1">
+                <Button Classes="Primary"  Grid.Row="1">
                     <StackPanel Orientation="Horizontal">
                         <Image HorizontalAlignment="Left" Source="{SvgImage /Assets/Images/logo.svg}" Width="20" Height="20"></Image>
                         <Label IsVisible="{Binding IsSidebarOpen}">

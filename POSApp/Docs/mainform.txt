@@ -111,7 +111,7 @@ SQL = "SELECT StockHolderID, HolderTitle FROM gen_StockHoldersInfo "
 
 
 
-
+// collected by
     SQL = "select EmployeeCode, EmployeeName from gen_EmployeesInfo Where SalariedEmployee=1 and Collecter = 1 "
     SQL = SQL & " and discontinue = 0 "
     If myRightObject.get_UserBusinessUnitId > 0 Then
@@ -120,14 +120,19 @@ SQL = "SELECT StockHolderID, HolderTitle FROM gen_StockHoldersInfo "
     SQL = SQL & " Order By EmployeeName"
     Set rsEst_Employees = cN.Execute(SQL)
 
-
+// salesmand
     SQL = "select EmployeeCode, EmployeeName from gen_EmployeesInfo Where salesman = 1  "
     SQL = SQL & " and discontinue = 0 "
     If myRightObject.get_UserBusinessUnitId > 0 Then
         SQL = SQL & " and businessUnitID = " & myRightObject.get_UserBusinessUnitId
     End If
     SQL = SQL & " Order By EmployeeName"
-    Set rsEst_SalesmanEmployees = cN.Execute(SQL)
+    Set rsEst_SalesmanEmployees = 
+    
+    
+    
+    
+    cN.Execute(SQL)
 
 
     SQL = "select EmployeeCode, EmployeeName from gen_EmployeesInfo Where Packman = 1  "

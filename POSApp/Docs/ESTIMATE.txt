@@ -1,0 +1,315 @@
+HostId = Replace(cN.Execute("SELECT HOST_ID() rslt").Fields("rslt"), " ", "")
+
+
+
+Private Sub GetFormID()
+gFormID = myRightObject.get_UserEmployeeId & HostId & Replace(Timer, ".", "")
+End Sub
+
+-->
+
+
+Public Function OperationMode(pForm As Form, pMode As Enum_OperationMode, pRecordCount As Double, Optional pActualRecordCount As Double) As Enum_OperationMode
+
+Select Case pMode
+Case opm_NavigationMode
+    If pRecordCount > 0 Then
+        pForm.cmd_First.Enabled = True
+        pForm.cmd_Last.Enabled = True
+        pForm.cmd_Previous.Enabled = True
+        pForm.cmd_Next.Enabled = True
+        If InStr(1, myRightsString, "EDIT") > 0 Then pForm.cmd_Edit.Enabled = True Else pForm.cmd_Edit.Enabled = False
+        If InStr(1, myRightsString, "DELETE") > 0 Then pForm.cmd_Delete.Enabled = True Else pForm.cmd_Delete.Enabled = False
+        pForm.cmd_Search.Enabled = True
+        If InStr(1, myRightsString, "PRINT") > 0 Then pForm.cmd_Print.Enabled = True Else pForm.cmd_Print.Enabled = False
+    Else
+        pForm.cmd_First.Enabled = False
+        pForm.cmd_Last.Enabled = False
+        pForm.cmd_Previous.Enabled = False
+        pForm.cmd_Next.Enabled = False
+        pForm.cmd_Edit.Enabled = False
+        pForm.cmd_Delete.Enabled = False
+        pForm.cmd_Print.Enabled = False
+        If pActualRecordCount = 0 Then pForm.cmd_Search.Enabled = False Else pForm.cmd_Search.Enabled = True
+    End If
+    If InStr(1, myRightsString, "ADD NEW") > 0 Then pForm.cmd_New.Enabled = True Else pForm.cmd_New.Enabled = False
+    pForm.cmd_Close.Enabled = True
+    pForm.cmd_New.Caption = "&New"
+    pForm.cmd_Search.Caption = "Searc&h"
+    pForm.cmd_Close.Caption = "&Close"
+Case opm_EditMode
+    pForm.cmd_First.Enabled = False
+    pForm.cmd_Last.Enabled = False
+    pForm.cmd_Previous.Enabled = False
+    pForm.cmd_Next.Enabled = False
+    pForm.cmd_Edit.Enabled = False
+    pForm.cmd_Delete.Enabled = False
+    pForm.cmd_Search.Enabled = False
+    pForm.cmd_New.Caption = "&Update"
+    pForm.cmd_Close.Caption = "&Cancel"
+    pForm.cmd_Print.Enabled = False
+Case opm_AddNewMode
+    pForm.cmd_First.Enabled = False
+    pForm.cmd_Last.Enabled = False
+    pForm.cmd_Previous.Enabled = False
+    pForm.cmd_Next.Enabled = False
+    pForm.cmd_Edit.Enabled = False
+    pForm.cmd_Delete.Enabled = False
+    pForm.cmd_Search.Enabled = False
+    pForm.cmd_New.Caption = "&Save"
+    pForm.cmd_Close.Caption = "&Cancel"
+    pForm.cmd_Print.Enabled = False
+Case opm_SearchMode
+    pForm.cmd_New.Enabled = False
+    pForm.cmd_First.Enabled = False
+    pForm.cmd_Last.Enabled = False
+    pForm.cmd_Previous.Enabled = False
+    pForm.cmd_Next.Enabled = False
+    pForm.cmd_Edit.Enabled = False
+    pForm.cmd_Delete.Enabled = False
+    pForm.cmd_Search.Caption = "&Go"
+    pForm.cmd_Close.Caption = "&Cancel"
+    pForm.cmd_Print.Enabled = False
+End Select
+OperationMode = pMode
+GetFormID
+End Function
+
+
+
+
+Private Sub ControlMode(pMode As Integer)
+    Select Case pMode
+    Case cma_Enable
+        dbc_Session.Enabled = False
+        dtp_EntryDate.Enabled = False
+        txt_VoucherNo.Locked = True
+        cmd_AddNewProductType.Enabled = True
+        cmd_Go.Enabled = False
+        dbc_Doctor.Enabled = True
+        dbc_CollectedBy.Enabled = True
+        txt_PatientName.Enabled = True
+        dtp_PrescriptionDate.Enabled = True
+        
+        txt_MaxDiscPercent.Enabled = True
+        txt_DiscountPercent.Enabled = True
+        
+        txt_EstimationDays.Enabled = True
+        'txt_Symptoms.Enabled = True
+        dbc_CustomerParty.Enabled = True
+        'txt_Diagnose.Enabled = True
+        chk_PrescriptionReceived.Enabled = True
+        chk_ExcludeFromSales.Enabled = True
+        txt_BuyerName.Enabled = True
+        txt_CustomerName.Enabled = True
+        txt_GrossAmount.Enabled = True
+        txt_GrossAmount.Locked = True
+        txt_ProductCode.Enabled = True
+        dbc_ProductName.Enabled = True
+        dbc_StockHolder.Enabled = StockHolderEnable
+        txt_BatchNo.Enabled = Not RestrictBatchSelectionOnEstimateAndSales 'True
+        dtp_Expiry.Enabled = Not RestrictBatchSelectionOnEstimateAndSales 'True
+        If bln_DontCheckProductPrice = True Then txt_UnitCost.Locked = True
+        txt_PackSize.Enabled = False
+        txt_StripSize.Enabled = False
+        txt_Quantity.Enabled = True
+        txt_EstimatedLoose.Enabled = False
+        txt_UnitCost.Enabled = True
+        txt_GrossDetail.Enabled = False
+        cmd_AddEntry.Enabled = True
+        txt_BinLocation.Locked = True
+        txt_BinLocation.Enabled = True
+        cmd_ClearEntry.Enabled = True
+        chk_UnDeleteAble.Enabled = True
+        cmd_MarketPurchaseDemand.Enabled = True
+        txt_SaleReturnVNo.Enabled = True
+        txt_SaleReturnAmount.Enabled = True
+        txt_SalesReturnTotal.Enabled = True
+        dbc_StockSupplier.Enabled = True
+        chk_SalesBase.Enabled = True
+        txt_StockRate.Enabled = False
+        txt_MaxDiscPercent.Enabled = True
+        txt_MaxDiscAmount.Enabled = False
+        txt_LPTotal.Enabled = True
+        txt_LPTotal.Locked = True
+        txt_NetAmount.Enabled = True
+        txt_NetAmount.Locked = True
+        txt_MarketRetailPrice.Enabled = False
+        cbo_Gender.Enabled = Not bln_DisablePatientExtraInfo
+        txt_Age.Enabled = Not bln_DisablePatientExtraInfo
+        txt_MobileNo.Enabled = Not bln_DisablePatientExtraInfo
+        
+    Case cma_Disable
+        cmd_AddNewProductType.Enabled = False
+        dbc_Session.Enabled = True
+        dtp_EntryDate.Enabled = False
+        chk_PrescriptionReceived.Enabled = True
+        chk_ExcludeFromSales.Enabled = False
+        txt_VoucherNo.Enabled = True
+        txt_VoucherNo.Locked = False
+        txt_BinLocation.Enabled = False
+        cmd_Go.Enabled = True
+        dbc_Doctor.Enabled = False
+        dbc_CollectedBy.Enabled = False
+        txt_PatientName.Enabled = False
+        dtp_PrescriptionDate.Enabled = False
+        txt_MaxDiscPercent.Enabled = False
+        txt_DiscountPercent.Enabled = False
+        cbo_Gender.Enabled = False
+        txt_Age.Enabled = False
+        txt_EstimationDays.Enabled = False
+        'txt_Symptoms.Enabled = False
+        dbc_CustomerParty.Enabled = False
+        'txt_Diagnose.Enabled = False
+        txt_MobileNo.Enabled = False
+        txt_BuyerName.Enabled = False
+        txt_CustomerName.Enabled = False
+        txt_GrossAmount.Enabled = True
+        txt_GrossAmount.Locked = True
+        txt_ProductCode.Enabled = False
+        dbc_ProductName.Enabled = False
+        dbc_StockHolder.Enabled = False
+        txt_ProductStock.Enabled = False
+        txt_BarCodeStock.Enabled = False
+        txt_BatchNo.Enabled = False
+        dtp_Expiry.Enabled = False
+        txt_PackSize.Enabled = False
+        txt_StripSize.Enabled = False
+        txt_Quantity.Enabled = False
+        txt_EstimatedLoose.Enabled = False
+        txt_UnitCost.Enabled = False
+        txt_GrossDetail.Enabled = False
+        cmd_AddEntry.Enabled = False
+        cmd_ClearEntry.Enabled = False
+        chk_UnDeleteAble.Enabled = False
+        cmd_MarketPurchaseDemand.Enabled = False
+        txt_SaleReturnVNo.Enabled = False
+        txt_SaleReturnAmount.Enabled = True
+        txt_SalesReturnTotal.Enabled = True
+        dbc_StockSupplier.Enabled = False
+        chk_SalesBase.Enabled = False
+        txt_StockRate.Enabled = False
+        txt_MaxDiscPercent.Enabled = False
+        txt_MaxDiscAmount.Enabled = False
+        txt_LPTotal.Enabled = True
+        txt_LPTotal.Locked = True
+        txt_NetAmount.Enabled = True
+        txt_NetAmount.Locked = True
+        txt_MarketRetailPrice.Enabled = False
+    Case cma_Empty
+        chk_PrescriptionReceived.Value = vbUnchecked
+        dtp_Expiry.Value = Date
+        bln_StopSaleInLoose = Empty
+        bln_ForceRate = Empty
+        bln_IsShortItem = Empty
+        chk_ExcludeFromSales.Value = vbUnchecked
+        Lbl_Short.Visible = False
+        dtp_Expiry.CheckBox = True
+        dtp_Expiry.CustomFormat = "MMM-yyyy"
+        dtp_Expiry.Value = Null
+        txt_TotalEstDays.Text = ""
+        txt_VoucherNo.Text = ""
+        dbc_Doctor.Text = ""
+        EntryTempSensitive = False
+        txt_BinLocation = ""
+        'dbc_CollectedBy.Text = ""
+        chk_UnDeleteAble.Value = vbUnchecked
+        txt_StockRate = Empty
+        EstimationDays = Empty
+        txt_StockRateSource = Empty
+        txt_StockRateSourceID = Empty
+        txt_PatientName.Text = ""
+        dtp_PrescriptionDate.Value = Date
+        dtp_PrescriptionDate.Value = Null
+        txt_ProductStock.Enabled = False
+        txt_BarCodeStock.Enabled = False
+        cbo_Gender.ListIndex = 0
+        txt_Age.Text = ""
+        txt_EstimationDays.Text = "1"
+        'txt_Symptoms.Text = ""
+        dbc_CustomerParty = ""
+        'txt_Diagnose.Text = ""
+        txt_MobileNo.Text = ""
+        txt_BuyerName.Text = ""
+        txt_CustomerName.Text = ""
+        txt_GrossAmount.Text = ""
+        txt_ProductCode.Text = ""
+        dbc_ProductName.Text = ""
+        dbc_StockHolder.Text = ""
+        txt_BatchNo.Text = ""
+        dtp_Expiry.Value = Date
+        dtp_Expiry.CheckBox = True
+        dtp_Expiry.CustomFormat = "MMM-yyyy"
+        dtp_Expiry.Value = Null
+        txt_ProductStock = "0"
+        txt_BarCodeStock.Text = "0"
+        txt_PackSize.Text = ""
+        txt_StripSize.Text = ""
+        txt_Quantity.Text = ""
+        txt_NoofItems.Text = ""
+        txt_NetQuantity.Text = ""
+        txt_EstimatedLoose.Text = ""
+        txt_UnitCost.Text = ""
+        txt_GrossDetail.Text = ""
+        GridDetail.Rows = 1
+        Grid_SaleReturn.Rows = 1
+        gDemandStatisfied = True
+        txt_SaleReturnVNo.Text = ""
+        txt_SaleReturnVNo.Tag = ""
+        txt_SaleReturnAmount.Text = ""
+        txt_SalesReturnTotal.Text = ""
+        dbc_StockSupplier = ""
+        chk_SalesBase.Value = vbUnchecked
+        txt_StockRate = ""
+        gBarCodeStockID = 0
+        txt_MarketRetailPrice.Text = ""
+        txt_MaxDiscPercent.Text = ""
+        txt_MaxDiscAmount.Text = ""
+        txt_NetAmount.Text = ""
+        txt_LPTotal.Text = ""
+        Set rsPrescription = Nothing
+        
+    End Select
+End Sub
+
+
+
+Private Sub Load_Inital_Data()
+'    cN.Execute "DELETE FROM data_EstimationInfo WHERE Saved=0 AND LockedByTerminal=HOST_NAME()"
+    GetFormID
+    stb_Message.Panels(1).Width = stb_Message.Width / 4
+    stb_Message.Panels(2).Width = stb_Message.Width - stb_Message.Panels(1).Width
+    stb_Message.Panels(1).Text = "Please Wait while loading Previously Feeded data..."
+    DoEvents
+    CurrentMode = OperationMode(Me, opm_NavigationMode, master_RecordCount, master_ActualRecordCount)
+    ControlMode cma_Disable
+    
+    adjust_Grid
+    DoEvents
+    PopulateProducts
+    DoEvents
+    Populate_Parties
+    DoEvents
+    PopulateEmployees
+    DoEvents
+    populateDoctors
+    DoEvents
+    PopulateSuppliers
+    DoEvents
+    PopulateSession
+    PopulateBusinessUnit
+    DoEvents
+    Populate_StockHolders
+    DoEvents
+    dtp_EntryDate.Value = CurrentDate
+    DoEvents
+    Populate_lst_ColoumnsWidth
+    
+    
+    
+    
+    chk_AutoPrint.Value = GetSetting(App.EXEName, Me.Name, chk_AutoPrint.Name, 0)
+    chk_WithEstimationNo.Value = GetSetting(App.EXEName, Me.Name, chk_WithEstimationNo.Name, 0)
+    
+'    If cmd_New.Enabled = True Then cmd_New.SetFocus
+End Sub

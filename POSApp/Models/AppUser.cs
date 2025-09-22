@@ -8,5 +8,5 @@ public class AppUser
     public required string LoginType { get; set; }
     public required bool BackSessionWorkingAllowed { get; set; }
     public required bool BackDateWorkingAllowed { get; set; }
-    public required int DefaultBusinessUnitID { get; set; } 
+    public required int DefaultBusinessUnitID { get; set; }
 }

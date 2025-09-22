@@ -148,11 +148,6 @@ If Not IsNull(dbc_BusinessUnit.SelectedItem) Then
     master_MainSQL = master_MainSQL & "  And (data_EstimationInfo.BusinessUnitID  = " & dbc_BusinessUnit.BoundText & ")"
 End If
 
-'If EstimateToMarketPurchase = True Then
-'     master_MainSQL = master_MainSQL & " and data_EstimationInfo.NewRecordByEmployeeID = " & myRightObject.get_UserEmployeeId
-'End If
-
-
 
 End Sub
 

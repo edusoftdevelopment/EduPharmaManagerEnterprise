@@ -10,12 +10,16 @@ using POSApp.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using POSApp.Helpers;
 
 namespace POSApp.ViewModels;
 
 public partial class EstimationInfoViewModel : PageViewModel
 {
     #region Properties
+
+    private const string MasterTableName = "data_EstimationInfo";
+    private const string MasterIdField = "EstimationID";
 
     private readonly DropdownService _dropdownService;
     private readonly AppStateViewModel _appStateViewModel;
@@ -24,9 +28,9 @@ public partial class EstimationInfoViewModel : PageViewModel
     public IEnumerable<Dropdown<int>> SessionList { get; set; } = [];
     public IEnumerable<Dropdown<int>> BusinessUnitList { get; set; } = [];
     public IEnumerable<Dropdown<int>> PartyList { get; set; } = [];
-    public IEnumerable<Dropdown<int>> CustomerList { get; set; } = [];
     public IEnumerable<Dropdown<int>> ProductList { get; set; } = [];
     public IEnumerable<Dropdown<int>> StockHolderList { get; set; } = [];
+    private string FormId { get; set; }
 
     #endregion
 
@@ -35,18 +39,28 @@ public partial class EstimationInfoViewModel : PageViewModel
     [NotifyPropertyChangedFor(nameof(IsViewMode))]
     [NotifyPropertyChangedFor(nameof(IsEditMode))]
     [NotifyPropertyChangedFor(nameof(IsNewMode))]
-    private FormMode _formMode = FormMode.View;
+    private FormMode _formMode;
     
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(RecordCountString))]
+    private long _recordCount;
+    
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(RecordCountString))]
+    private long _currentRecordNumber;
+    
+    [ObservableProperty] private long _estimationId;
     [ObservableProperty] private bool _isPrescriptionReceived;
     [ObservableProperty] private DateTime _selectedEntryDate = DateTime.Now;
     [ObservableProperty] private bool _isUnDeletable;
     [ObservableProperty] private long _estimationNo;
-    [ObservableProperty] private Dropdown<int> _selectedCollectedBy;
-    [ObservableProperty] private Dropdown<int> _selectedSession;
-    [ObservableProperty] private Dropdown<int> _selectedBusinessUnit;
+
+    [ObservableProperty] private int _selectedCollectedByID;
+    [ObservableProperty] private int _selectedSessionID;
+    [ObservableProperty] private int _selectedBusinessUnitID;
+    [ObservableProperty] private int _selectedPartyID;
+    [ObservableProperty] private string _customerName;
     [ObservableProperty] private string _salesReturnVNo;
-    [ObservableProperty] private Dropdown<int> _selectedParty;
-    [ObservableProperty] private Dropdown<int> _selectedCustomer;
     [ObservableProperty] private string _salesReturnAmount;
 
     // Header
@@ -76,7 +90,7 @@ public partial class EstimationInfoViewModel : PageViewModel
     [ObservableProperty] private string _estimatedDaysFooter;
     [ObservableProperty] private string _items;
     [ObservableProperty] private string _itemsQty;
-    [ObservableProperty] private string _estimatedNetGrossAmount;
+    [ObservableProperty] private decimal _estimatedNetGrossAmount;
     [ObservableProperty] private string _lPValue;
     [ObservableProperty] private string _totalSalesReturnAmount;
     [ObservableProperty] private string _lMax;
@@ -85,11 +99,38 @@ public partial class EstimationInfoViewModel : PageViewModel
     [ObservableProperty] private string _estimatedTotalAmount;
     [ObservableProperty] private bool _isPrintStyleTwo;
     
+    // Buttons
+    [ObservableProperty] 
+    private bool _isButtonFirstEnabled;
+    [ObservableProperty] 
+    private bool _isButtonPreviousEnabled;
+    [ObservableProperty] 
+    private bool _isButtonNextEnabled;
+    [ObservableProperty] 
+    private bool _isButtonLastEnabled;
+    [ObservableProperty] 
+    private bool _isButtonSaveEnabled;
+    [ObservableProperty] 
+    private bool _isButtonEditEnabled;
+    [ObservableProperty] 
+    private bool _isButtonDeleteEnabled;
+    [ObservableProperty] 
+    private bool _isButtonSearchEnabled;
+    [ObservableProperty] 
+    private bool _isButtonPrintEnabled;
+    [ObservableProperty] 
+    private bool _isButtonCancelEnabled;
+    [ObservableProperty] 
+    private bool _isButtonMaximizeEnabled;
+
+    
     
     // Derived State
     public bool IsViewMode => FormMode == FormMode.View;
     public bool IsNewMode => FormMode == FormMode.New;
     public bool IsEditMode => FormMode == FormMode.Edit;
+
+    public string RecordCountString => $"Record: {CurrentRecordNumber}/{RecordCount}";
 
     #endregion
 
@@ -118,66 +159,134 @@ public partial class EstimationInfoViewModel : PageViewModel
 
     private async Task LoadDropdownAsync()
     {
-        CollectedByList = await _dropdownService.GetCollectedByList();
-        SessionList = await _dropdownService.GetSessionList();
-        BusinessUnitList = await _dropdownService.GetBusinessUnitList(_appStateViewModel.User!.DefaultBusinessUnitID);
-        PartyList = await _dropdownService.GetPartyList();
-        CustomerList = await _dropdownService.GetCustomerList();
-        ProductList = await _dropdownService.GetProductsList();
-        StockHolderList = await _dropdownService.GetStockHolderList();
+        var collectedByTask = _dropdownService.GetCollectedByList(
+            businessUnitId:_appStateViewModel.User!.DefaultBusinessUnitID);
+        var sessionTask = _dropdownService.GetSessionList();
+        var businessUnitTask = _dropdownService.GetBusinessUnitList(_appStateViewModel.User!.DefaultBusinessUnitID);
+        var partyTask = _dropdownService.GetPartyList();
+        var productTask = _dropdownService.GetProductsList();
+        var stockHolderTask = _dropdownService.GetStockHolderList();
+        var hostIdTask = _estimationInfoService.GetHostID();
+
+        await Task.WhenAll(hostIdTask, collectedByTask, sessionTask, businessUnitTask, partyTask, productTask, stockHolderTask);
+        
+        CollectedByList = await collectedByTask;
+        SessionList = await sessionTask;
+        BusinessUnitList = await businessUnitTask;
+        PartyList = await partyTask;
+        ProductList = await productTask;
+        StockHolderList = await stockHolderTask;
+
+        FormId = $"{_appStateViewModel.User.LoginId}{await hostIdTask}{DateTime.Now:yyyyMMddHHmmss}";
     }
 
-    public async Task LoadRecordAsync()
+    public async Task LoadRecordAsync(MoveDirection moveDirection = MoveDirection.Last)
     {
-        var record = await _estimationInfoService.Load();
-
-        if (record != null)
+        var masterInfo = await _estimationInfoService.Load(MasterTableName, MasterIdField, moveDirection, currentRecordId: EstimationId);
+        
+        RecordCount = masterInfo.RecordCount;
+        CurrentRecordNumber = masterInfo.CurrentRecordNumber;
+        
+        var record = masterInfo.Data;
+        
+        EstimationId = record.EstimationID;
+        if (record.EstimationDate != null)
         {
-            if (record.EstimationDate != null)
-            {
-                SelectedEntryDate = record.EstimationDate.Value;
-            }   
-            if (record.EstimationNo != null)
-            {
-                EstimationNo = record.EstimationNo.Value;
-            }
-            IsUnDeletable = record.UnDeleteable;
-            
-            if (record.SessionID != null)
-            {
-                var match = SessionList.FirstOrDefault(x => x.Id == record.SessionID.Value);
-                if (match != null)
-                {
-                    SelectedSession = match;
-                }
-            }
-            
-            if (record.BusinessUnitID != null)
-            {
-                var match = BusinessUnitList.FirstOrDefault(x => x.Id == record.BusinessUnitID.Value);
-                if (match != null)
-                {
-                    SelectedSession = match;
-                }
-            }
-            
-            if (record.PartyID != null)
-            {
-                var match = PartyList.FirstOrDefault(x => x.Id == record.PartyID.Value);
-                if (match != null)
-                {
-                    SelectedParty = match;
-                }
-            }
+            SelectedEntryDate = record.EstimationDate.Value;
+        }   
+        if (record.EstimationNo != null)
+        {
+            EstimationNo = record.EstimationNo.Value;
+        }
 
-            if (record.EstimationDays != null)
-            {
-                EstimatedDays = record.EstimationDays.Value;
-            }
-            
-            AddedDetail = new ObservableCollection<EstimationInfoDetail>(record.Details);
+        IsPrescriptionReceived = record.PrescriptionReceived;
+        
+        IsUnDeletable = record.UnDeleteable;
+        SelectedSessionID = record.SessionID ?? -1;
+        SelectedBusinessUnitID = record.BusinessUnitID ?? -1;
+        SelectedCollectedByID = record.CollectedById ?? -1;
+        SelectedPartyID = record.PartyID ?? -1;
+        CustomerName = record.CustomerName;
+        EstimatedDays = record.EstimationDays ?? 0;
+        EstimatedNetGrossAmount = record.GrossAmount ?? 0;
+        
+        AddedDetail = new ObservableCollection<EstimationInfoDetail>(record.Details);
+
+        FormMode = FormMode.View;
+    }
+
+    public async Task SetupFormAsync()
+    {
+        // chk_AutoPrint.Value = GetSetting(App.EXEName, Me.Name, chk_AutoPrint.Name, 0)
+        // chk_WithEstimationNo.Value = GetSetting(App.EXEName, Me.Name, chk_WithEstimationNo.Name, 0)
+    }
+
+    partial void OnFormModeChanged(FormMode value)
+    {
+        switch (value)
+        {
+            case FormMode.New:
+                break;
+            case FormMode.View:
+
+                if (RecordCount > 0)
+                {
+                    if (RecordCount == 1)
+                    {
+                        IsButtonLastEnabled = false;
+                        IsButtonPreviousEnabled = false;
+                        IsButtonNextEnabled = false;
+                        IsButtonSearchEnabled = false;
+                        IsButtonFirstEnabled = false;
+                    }
+                    else
+                    {
+                        IsButtonLastEnabled = true;
+                        IsButtonPreviousEnabled = true;
+                        IsButtonNextEnabled = true;
+                        IsButtonSearchEnabled = true;
+                        IsButtonFirstEnabled = true;
+                    }
+                }
+                else
+                {
+                    IsButtonFirstEnabled = false;
+                    IsButtonLastEnabled = false;
+                    IsButtonPreviousEnabled = false;
+                    IsButtonNextEnabled = false;
+                    IsButtonEditEnabled = false;
+                    IsButtonDeleteEnabled = false;
+                    IsButtonPrintEnabled = false;
+                    // TODO: If pActualRecordCount = 0 Then pForm.cmd_Search.Enabled = False Else pForm.cmd_Search.Enabled = True
+                }
+                
+                // TODO: If InStr(1, myRightsString, "ADD NEW") > 0 Then pForm.cmd_New.Enabled = True Else pForm.cmd_New.Enabled = False
+                
+                
+                break;
+            case FormMode.Edit:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
+
+    private void ChangeControlMode(FormMode mode)
+    {
+        // TODO: complete this
+        switch (mode)
+        {
+            case FormMode.New:
+                break;
+            case FormMode.View:
+                break;
+            case FormMode.Edit:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
+        }
+    }
+
 
     #endregion
 
@@ -210,23 +319,46 @@ public partial class EstimationInfoViewModel : PageViewModel
     }
 
     [RelayCommand]
-    private void First()
+    private async Task First()
     {
+        await LoadRecordAsync(MoveDirection.First);
     }
 
     [RelayCommand]
-    private void Previous()
+    private async Task Previous()
     {
+        try
+        {
+            await LoadRecordAsync(MoveDirection.Previous);
+        }
+        catch (Exception ex)
+        {
+            if (ex is NoPreviousRecordException)
+            {
+                
+            }
+        }
     }
 
     [RelayCommand]
-    private void Next()
+    private async Task Next()
     {
+        try
+        {
+            await LoadRecordAsync(MoveDirection.Next);
+        }
+        catch (Exception ex)
+        {
+            if (ex is NoNextRecordException)
+            {
+                
+            }
+        }
     }
-
     [RelayCommand]
-    private void Last()
+    private async Task Last()
     {
+        await LoadRecordAsync(MoveDirection.Last);
     }
 
     [RelayCommand]

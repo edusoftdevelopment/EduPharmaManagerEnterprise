@@ -43,6 +43,11 @@ public partial class LoadingSplashWindowViewModel : PageViewModel
             
             await estimationInfoViewModel.LoadRecordAsync();
             
+            LoadingText = "Setting up form...";
+            
+            await estimationInfoViewModel.SetupFormAsync();
+
+            
             var window = new EstimationInfoWindow()
             {
                 DataContext = estimationInfoViewModel
